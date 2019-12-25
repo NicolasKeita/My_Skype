@@ -10,11 +10,18 @@ void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddre
                                                     unsigned int port)
 {
     _udp.setServer(hostAddress, port);
-    std::thread thread(&babel::NetworkHandler::_handleProtocolVOIP, this);
-    thread.detach();
+    _thread = std::thread(&babel::NetworkHandler::_handleProtocolVOIP, this);
 }
 
 void babel::NetworkHandler::_handleProtocolVOIP()
 {
-    _udp.sendMessage("Hello world");
+    std::string messageToSend = "Hello world !";
+    while (true) {
+        _udp.sendMessage(messageToSend);
+    }
+}
+
+void babel::NetworkHandler::stopCurrentCommunication()
+{
+    _thread.join();
 }

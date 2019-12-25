@@ -1,5 +1,7 @@
 [requires]
 boost/1.69.0@conan/stable
+portaudio/v190600.20161030@bincrafters/stable
+qt/5.14.0@bincrafters/stable
 
 [build_requires]
 

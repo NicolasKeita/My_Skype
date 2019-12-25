@@ -41,7 +41,7 @@ void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & m
         return;
     }
 
-    auto message_cast = boost::any_cast<const std::string &>(message);
+    const std::string message_cast = boost::any_cast<const std::string>(message);
     size_t request_length = message_cast.size();
 
     _socket.send_to(boost::asio::buffer(message_cast,
