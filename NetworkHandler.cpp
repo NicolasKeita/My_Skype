@@ -8,5 +8,5 @@
 void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddress,
                                                     unsigned int port)
 {
-
+    _udp.sendMessage("Hello world");
 }

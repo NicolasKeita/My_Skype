@@ -14,10 +14,10 @@ namespace babel {
             NetworkHandler() = default;
 
             void startVoiceCommunication(const std::string &hostAddress,
-                                         unsigned int port)
+                                         unsigned int port);
 
         private:
-
+            uti::network::ClientUdpMultiThreadWrapper _udp;
     };
 }
 

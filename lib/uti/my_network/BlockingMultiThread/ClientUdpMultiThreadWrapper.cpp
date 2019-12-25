@@ -34,10 +34,12 @@ void uti::network::ClientUdpMultiThreadWrapper::setServer(const std::string &ser
     _serverSet = true;
 }
 
-void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const std::string & message)
+void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & message)
 {
-    size_t request_length = message.size();
-    _socket.send_to(boost::asio::buffer(message,
+    //size_t request_length = message.size();
+    auto message_cast = boost::any_cast<const std::string &>(message);
+    size_t request_length = message_cast.size();
+    _socket.send_to(boost::asio::buffer(message_cast,
                                         request_length),
                     *_endpoints.begin());
 }
