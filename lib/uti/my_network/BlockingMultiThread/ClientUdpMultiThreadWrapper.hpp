@@ -20,7 +20,7 @@ namespace uti::network {
         public:
             ClientUdpMultiThreadWrapper();
 
-            void setServer(const std::string &serverAddress, size_t port) override;
+            void setServer(const std::string &serverAddress, unsigned int port) override;
             void sendMessage(const boost::any & message);
             std::string getReply();
             void stop();

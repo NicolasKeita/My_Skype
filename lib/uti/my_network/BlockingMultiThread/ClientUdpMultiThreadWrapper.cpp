@@ -19,7 +19,7 @@ uti::network::ClientUdpMultiThreadWrapper::ClientUdpMultiThreadWrapper()
 {}
 
 void uti::network::ClientUdpMultiThreadWrapper::setServer(const std::string &serverAddress,
-                                                          size_t port)
+                                                          unsigned int port)
 {
     _serverAddress = serverAddress;
     _port = port;
@@ -36,9 +36,14 @@ void uti::network::ClientUdpMultiThreadWrapper::setServer(const std::string &ser
 
 void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & message)
 {
-    //size_t request_length = message.size();
+    if (!_serverSet) {
+        std::cerr << "[Network ClientUdpMultiThread] Where to send ? You first have to set a host" << std::endl;
+        return;
+    }
+
     auto message_cast = boost::any_cast<const std::string &>(message);
     size_t request_length = message_cast.size();
+
     _socket.send_to(boost::asio::buffer(message_cast,
                                         request_length),
                     *_endpoints.begin());

@@ -17,6 +17,9 @@ namespace babel {
                                          unsigned int port);
 
         private:
+            void _handleProtocolVOIP();
+
+        private:
             uti::network::ClientUdpMultiThreadWrapper _udp;
     };
 }
