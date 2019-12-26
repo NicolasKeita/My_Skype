@@ -8,10 +8,10 @@
 #ifndef MY_BABEL_GRAPHICWRAPPER_HPP
 #define MY_BABEL_GRAPHICWRAPPER_HPP
 
-#include <QtGui>
-#include <QtWidgets>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDialog>
 #include "IGraphicWrapper.hpp"
-#include "ClientWrapper.hpp"
+#include "ClientUdpMultiThreadWrapper.hpp"
 
 namespace babel::graphic {
     class GraphicWrapper : public QDialog, public IGraphicWrapper {
@@ -28,7 +28,7 @@ namespace babel::graphic {
             void sound_test(); // TODO : remove
             QApplication        &_app;
             QWidget         _window;
-            babel::network::ClientWrapper   network;
+            //babel::network::ClientWrapper   network;
     };
 }
 

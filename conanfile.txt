@@ -6,7 +6,9 @@ qt/5.14.0@bincrafters/stable
 [build_requires]
 
 [options]
-boost:shared=True
+boost:shared=False
+qt:shared=False
+portaudio:shared=False
 
 [generators]
 cmake

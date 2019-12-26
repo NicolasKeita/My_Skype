@@ -1,5 +1,4 @@
-#include <QtGui>
-#include <QtWidgets>
+#include <QtWidgets/QApplication>
 #include "GraphicWrapper.hpp"
 #include "NetworkHandler.hpp"
 
