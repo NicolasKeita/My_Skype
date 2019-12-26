@@ -20,7 +20,7 @@ void babel::NetworkHandler::_handleProtocolVOIP()
     AudioWrapper audio;
 
     while (true) {
-        //auto input_voice = audio.recordInputVoice();
+        auto input_voice = audio.recordInputVoice();
         //_udp.sendMessage(input_voice);
         //auto reply = _udp.getReply();
         //audio.listenSound(reply);
