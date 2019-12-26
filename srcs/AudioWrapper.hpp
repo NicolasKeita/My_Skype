@@ -11,6 +11,8 @@
 #define PA_SAMPLE_TYPE  paFloat32
 #define PRINTF_S_FORMAT "%.8f"
 using SAMPLE = unsigned char;
+#define NUM_CHANNELS (2)
+#define SAMPLE_SILENCE (0.0f)
 
 typedef struct
 {
@@ -24,8 +26,10 @@ namespace babel {
         public:
             AudioWrapper();
 
-            boost::any recordInputVoice();
+            //std::pair<unsigned char *, size_t> recordInputVoice();
+            std::pair<PaStream *,size_t> recordInputVoice();
             void listenSound(const boost::any &reply);
+            void clearBuffer();
 
         private:
             PaStreamParameters _inputParameters;
@@ -48,12 +52,10 @@ namespace babel {
         public:
             static constexpr int SAMPLE_RATE = 44100;
             static constexpr int FRAMES_PER_BUFFER = 512;
-            static constexpr int NUM_SECONDS = 5;
-            static constexpr int NUM_CHANNELS = 2;
+            static constexpr int NUM_SECONDS = 10; // Temps du recording
             static constexpr int DITHER_FLAG = 0;
 
             static constexpr int SAMPLE_SIZE = 4;
-            static constexpr float SAMPLE_SILENCE = 0.0f;
     };
 }
 

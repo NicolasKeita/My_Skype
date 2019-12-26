@@ -34,19 +34,25 @@ void uti::network::ClientUdpMultiThreadWrapper::setServer(const std::string &ser
     _serverSet = true;
 }
 
-void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & message)
+#include <portaudio.h>
+
+void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & message, size_t messageLength)
 {
     if (!_serverSet) {
         std::cerr << "[Network ClientUdpMultiThread] Where to send ? You first have to set a host" << std::endl;
         return;
     }
 
-    const std::string message_cast = boost::any_cast<const std::string>(message);
-    size_t request_length = message_cast.size();
+    //const std::string message_cast = boost::any_cast<const std::string>(message);
+    //unsigned char *message_cast = boost::any_cast<unsigned char *>(message);
+    PaStream *message_cast = boost::any_cast<PaStream *>(message);
 
-    _socket.send_to(boost::asio::buffer(message_cast,
-                                        request_length),
-                    *_endpoints.begin());
+    std::cerr << "messageLength " << messageLength << std::endl;
+
+
+        _socket.send_to(boost::asio::buffer(message_cast,
+                                            messageLength),
+                        *_endpoints.begin());
 }
 
 //Blocking

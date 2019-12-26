@@ -14,7 +14,7 @@ namespace uti::network {
     class IClientUdpMultiThreadWrapper {
         protected:
             virtual void setServer(const std::string &serverAddress, unsigned int port) = 0;
-            virtual void sendMessage(const boost::any & message) = 0;
+            virtual void sendMessage(const boost::any & message, size_t messageLength) = 0;
             virtual std::string getReply() = 0;
             virtual void stop() = 0;
     };
