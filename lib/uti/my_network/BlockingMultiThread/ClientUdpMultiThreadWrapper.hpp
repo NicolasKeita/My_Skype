@@ -21,9 +21,9 @@ namespace uti::network {
             ClientUdpMultiThreadWrapper();
 
             void setServer(const std::string &serverAddress, unsigned int port) override;
-            void sendMessage(const boost::any & message, size_t messageLength);
-            std::string getReply();
-            void stop();
+            void sendMessage(const boost::any & message, size_t messageLength) override;
+            std::string getReply() override;
+            void stop() override;
 
         private:
             boost::asio::io_context                         _io_context;

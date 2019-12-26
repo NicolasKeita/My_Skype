@@ -6,6 +6,24 @@
 #include <cstdlib>
 #include "AudioWrapper.hpp"
 
+static int playCallback( const void *inputBuffer, void *outputBuffer,
+                           unsigned long framesPerBuffer,
+                           const PaStreamCallbackTimeInfo* timeInfo,
+                           PaStreamCallbackFlags statusFlags,
+                           void *userData )
+{
+    (void) inputBuffer; /* Prevent unused variable warnings. */
+    (void) timeInfo;
+    (void) statusFlags;
+
+    auto *network = (babel::NetworkHandler *)userData;
+    const auto *outPtr = (const SAMPLE*)outputBuffer;
+
+    // TODO
+   // auto = network->getMessage();
+   // _err = Pa_WriteStream(_streamTheirVoice, )
+}
+
 static int recordCallback( const void *inputBuffer, void *outputBuffer,
                             unsigned long framesPerBuffer,
                             const PaStreamCallbackTimeInfo* timeInfo,
@@ -18,23 +36,22 @@ static int recordCallback( const void *inputBuffer, void *outputBuffer,
      (void) outputBuffer; /* Prevent unused variable warnings. */
      (void) timeInfo;
      (void) statusFlags;
-     (void) userData;
 
      std::vector<SAMPLE> dataToSend(framesPerBuffer * NUM_CHANNELS, SAMPLE_SILENCE);
      if (!inputBuffer)
      {
-         for(unsigned long i = 0; i < framesPerBuffer; ++i)
+         for(unsigned long i = 0; i < framesPerBuffer * NUM_CHANNELS; ++i)
          {
             dataToSend.push_back(SAMPLE_SILENCE);
-            if (NUM_CHANNELS == 2)
-                dataToSend.push_back(SAMPLE_SILENCE);
+            //if (NUM_CHANNELS == 2)
+            //    dataToSend.push_back(SAMPLE_SILENCE);
          }
      }
      else
      {
          dataToSend.insert(dataToSend.end(), rptr, rptr + framesPerBuffer * NUM_CHANNELS);
-         if (NUM_CHANNELS == 2)
-             dataToSend.insert(dataToSend.end(), rptr, rptr + framesPerBuffer * NUM_CHANNELS);
+         //if (NUM_CHANNELS == 2)
+         //    dataToSend.insert(dataToSend.end(), rptr, rptr + framesPerBuffer * NUM_CHANNELS);
      }
      data->sendMessage(std::string(dataToSend.begin(), dataToSend.end()));
      return paContinue;
@@ -42,7 +59,9 @@ static int recordCallback( const void *inputBuffer, void *outputBuffer,
 
 babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
         : _streamMyVoice { nullptr },
-        _sampleBlock { nullptr }
+          _streamTheirVoice { nullptr },
+          _sampleBlock { nullptr },
+          network { network }
 {
     // maxFrameIndex = NUM_SECONDS * SAMPLE_RATE;
     _totalFrames = NUM_SECONDS * SAMPLE_RATE;
@@ -82,29 +101,35 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
                          &network);
     if( _err != paNoError )
         exit(1);
-    _err = Pa_StartStream(_streamMyVoice);
-    if (_err != paNoError)
+    _err = Pa_OpenStream(&_streamTheirVoice,
+                         nullptr,
+                         &_outputParameters,
+                         SAMPLE_RATE,
+                         FRAMES_PER_BUFFER,
+                         paClipOff,
+                         playCallback,
+                         &network);
+    if( _err != paNoError )
         exit(1);
-    /*
-    while((_err = Pa_IsStreamActive(_streamMyVoice)) == 1) {
-//        Pa_Sleep(1000);
-
-        printf("index = %d\n", _dataMyVoice.frameIndex ); fflush(stdout);
-        _dataMyVoice.frameIndex = 0;
-        std::fill(_dataMyVoice.recordedSamples, _dataMyVoice.recordedSamples + _numBytes, 0);
-        //memset(_dataMyVoice.recordedSamples, 0, _numBytes * sizeof(*_dataMyVoice.recordedSamples));
-    }*/
 }
 
 std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
 {
+    _err = Pa_StartStream(_streamMyVoice);
+    if (_err != paNoError)
+        exit(1);
 }
 
 void babel::AudioWrapper::listenSound(const boost::any &reply)
 {
-
+    _err = Pa_StartStream(_streamTheirVoice);
+    if (_err != paNoError)
+        exit(1);
 }
 
 void babel::AudioWrapper::clearBuffer()
 {
+    _err = Pa_StartStream(_streamTheirVoice);
+    if (_err != paNoError)
+        exit(1);
 }

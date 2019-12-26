@@ -12,15 +12,9 @@
 #define PA_SAMPLE_TYPE  paFloat32
 #define PRINTF_S_FORMAT "%.8f"
 using SAMPLE = unsigned char;
+//using SAMPLE = float;
 #define NUM_CHANNELS (2)
 #define SAMPLE_SILENCE (0.0f)
-
-typedef struct
-{
-    int     frameIndex;
-    int     maxFrameIndex;
-    SAMPLE  *recordedSamples;
-} paTestData;
 
 namespace babel {
     class AudioWrapper {
@@ -49,6 +43,7 @@ namespace babel {
             SAMPLE              max;
             SAMPLE              val;
             double              average;
+            NetworkHandler      &network;
 
         public:
             static constexpr int SAMPLE_RATE = 44100;
