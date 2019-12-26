@@ -12,60 +12,43 @@ static int recordCallback( const void *inputBuffer, void *outputBuffer,
                             PaStreamCallbackFlags statusFlags,
                             void *userData )
  {
-     paTestData *data = (paTestData*)userData;
-     const SAMPLE *rptr = (const SAMPLE*)inputBuffer;
-     SAMPLE *wptr = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
-     long framesToCalc;
-     long i;
-     int finished;
-     unsigned long framesLeft = data->maxFrameIndex - data->frameIndex;
+     auto *data = (babel::NetworkHandler *)userData;
+     const auto *rptr = (const SAMPLE*)inputBuffer;
 
      (void) outputBuffer; /* Prevent unused variable warnings. */
      (void) timeInfo;
      (void) statusFlags;
      (void) userData;
 
-     if( framesLeft < framesPerBuffer )
+     std::vector<SAMPLE> dataToSend(framesPerBuffer * NUM_CHANNELS, SAMPLE_SILENCE);
+     if (!inputBuffer)
      {
-         framesToCalc = framesLeft;
-         finished = paComplete;
-     }
-     else
-     {
-         framesToCalc = framesPerBuffer;
-         finished = paContinue;
-     }
-
-     if( inputBuffer == NULL )
-     {
-         for( i=0; i<framesToCalc; i++ )
+         for(unsigned long i = 0; i < framesPerBuffer; ++i)
          {
-             *wptr++ = SAMPLE_SILENCE;  /* left */
-             if( NUM_CHANNELS == 2 ) *wptr++ = SAMPLE_SILENCE;  /* right */
+            dataToSend.push_back(SAMPLE_SILENCE);
+            if (NUM_CHANNELS == 2)
+                dataToSend.push_back(SAMPLE_SILENCE);
          }
      }
      else
      {
-         for( i=0; i<framesToCalc; i++ )
-         {
-             *wptr++ = *rptr++;  /* left */
-             if( NUM_CHANNELS == 2 ) *wptr++ = *rptr++;  /* right */
-         }
+         dataToSend.insert(dataToSend.end(), rptr, rptr + framesPerBuffer * NUM_CHANNELS);
+         if (NUM_CHANNELS == 2)
+             dataToSend.insert(dataToSend.end(), rptr, rptr + framesPerBuffer * NUM_CHANNELS);
      }
-     data->frameIndex += framesToCalc;
-     return finished;
+     data->sendMessage(std::string(dataToSend.begin(), dataToSend.end()));
+     return paContinue;
+ }
 
-}
-
-babel::AudioWrapper::AudioWrapper()
+babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
         : _stream { nullptr },
         _sampleBlock { nullptr }
 {
-    _data.maxFrameIndex = NUM_SECONDS * SAMPLE_RATE;
+    _dataMyVoice.maxFrameIndex = NUM_SECONDS * SAMPLE_RATE;
     _totalFrames = NUM_SECONDS * SAMPLE_RATE;
     _numSamples = _totalFrames * NUM_CHANNELS;
     _numBytes = _numSamples * sizeof(SAMPLE);
-    _data.recordedSamples = (SAMPLE *)calloc(_numBytes, 1);
+    _dataMyVoice.recordedSamples = (SAMPLE *)calloc(_numBytes, 1);
 
     _err = Pa_Initialize();
     if (_err != paNoError)
@@ -96,7 +79,7 @@ babel::AudioWrapper::AudioWrapper()
                          FRAMES_PER_BUFFER,
                          paClipOff,
                          recordCallback,
-                         &_data);
+                         &network);
     if( _err != paNoError )
         exit(1);
     _err = Pa_StartStream(_stream);
@@ -106,19 +89,19 @@ babel::AudioWrapper::AudioWrapper()
     while((_err = Pa_IsStreamActive(_stream)) == 1) {
 //        Pa_Sleep(1000);
 
-        printf("index = %d\n", _data.frameIndex ); fflush(stdout);
-        _data.frameIndex = 0;
-        std::fill(_data.recordedSamples, _data.recordedSamples + _numBytes, 0);
-        //memset(_data.recordedSamples, 0, _numBytes * sizeof(*_data.recordedSamples));
+        printf("index = %d\n", _dataMyVoice.frameIndex ); fflush(stdout);
+        _dataMyVoice.frameIndex = 0;
+        std::fill(_dataMyVoice.recordedSamples, _dataMyVoice.recordedSamples + _numBytes, 0);
+        //memset(_dataMyVoice.recordedSamples, 0, _numBytes * sizeof(*_dataMyVoice.recordedSamples));
     }*/
 }
 
 std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
 {
     return std::pair<PaStream *,size_t>(_stream, 10000);
-    SAMPLE *copySample = _data.recordedSamples = (SAMPLE *)calloc(_numBytes, 1);
-    std::copy(_data.recordedSamples, _data.recordedSamples + _numBytes, copySample);
-    std::pair<unsigned char *, size_t> newSample(copySample, _data.frameIndex);
+    SAMPLE *copySample = _dataMyVoice.recordedSamples = (SAMPLE *)calloc(_numBytes, 1);
+    std::copy(_dataMyVoice.recordedSamples, _dataMyVoice.recordedSamples + _numBytes, copySample);
+    std::pair<unsigned char *, size_t> newSample(copySample, _dataMyVoice.frameIndex);
     return newSample;
 }
 
@@ -129,6 +112,6 @@ void babel::AudioWrapper::listenSound(const boost::any &reply)
 
 void babel::AudioWrapper::clearBuffer()
 {
-    std::fill(_data.recordedSamples, _data.recordedSamples + _numBytes, 0);
-    _data.frameIndex = 0;
+    std::fill(_dataMyVoice.recordedSamples, _dataMyVoice.recordedSamples + _numBytes, 0);
+    _dataMyVoice.frameIndex = 0;
 }

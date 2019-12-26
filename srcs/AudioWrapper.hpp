@@ -7,6 +7,7 @@
 
 #include <boost/any.hpp>
 #include "portaudio.h"
+#include "NetworkHandler.hpp"
 
 #define PA_SAMPLE_TYPE  paFloat32
 #define PRINTF_S_FORMAT "%.8f"
@@ -16,15 +17,15 @@ using SAMPLE = unsigned char;
 
 typedef struct
 {
-    SAMPLE  *recordedSamples;
     int     frameIndex;
     int     maxFrameIndex;
+    SAMPLE  *recordedSamples;
 } paTestData;
 
 namespace babel {
     class AudioWrapper {
         public:
-            AudioWrapper();
+            AudioWrapper(NetworkHandler &network);
 
             //std::pair<unsigned char *, size_t> recordInputVoice();
             std::pair<PaStream *,size_t> recordInputVoice();
@@ -43,7 +44,8 @@ namespace babel {
             unsigned int        _numBytes;
             int                 _numChannels;
             unsigned int        _numSamples;
-            paTestData          _data;
+            paTestData          _dataMyVoice;
+            paTestData          _dataTheirVoice;
             int                 _totalFrames;
             SAMPLE              max;
             SAMPLE              val;

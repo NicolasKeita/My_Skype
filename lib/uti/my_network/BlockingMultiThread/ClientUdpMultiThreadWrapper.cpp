@@ -45,14 +45,11 @@ void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & m
 
     //const std::string message_cast = boost::any_cast<const std::string>(message);
     //unsigned char *message_cast = boost::any_cast<unsigned char *>(message);
-    PaStream *message_cast = boost::any_cast<PaStream *>(message);
+    std::string message_cast = boost::any_cast<std::string>(message);
 
-    std::cerr << "messageLength " << messageLength << std::endl;
-
-
-        _socket.send_to(boost::asio::buffer(message_cast,
-                                            messageLength),
-                        *_endpoints.begin());
+    _socket.send_to(boost::asio::buffer(message_cast,
+                                        messageLength),
+                    *_endpoints.begin());
 }
 
 //Blocking
