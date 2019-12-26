@@ -7,7 +7,12 @@ set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
+if (CONAN_BOOST_ROOT)
+    set(BOOST_ROOT CONAN_BOOST_ROOT)
+endif(CONAN_BOOST_ROOT)
+
 if (DEFINED ENV{BOOST_ROOT})
+    message("HEREEE --- ")
     set(Boost_NO_SYSTEM_PATHS TRUE)
     set(BOOST_ROOT $ENV{BOOST_ROOT})
     set(BOOST_INCLUDE_DIRS "${BOOST_ROOT}/include")
