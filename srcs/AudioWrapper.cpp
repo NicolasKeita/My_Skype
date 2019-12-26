@@ -41,14 +41,14 @@ static int recordCallback( const void *inputBuffer, void *outputBuffer,
  }
 
 babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
-        : _stream { nullptr },
+        : _streamMyVoice { nullptr },
         _sampleBlock { nullptr }
 {
-    _dataMyVoice.maxFrameIndex = NUM_SECONDS * SAMPLE_RATE;
+    // maxFrameIndex = NUM_SECONDS * SAMPLE_RATE;
     _totalFrames = NUM_SECONDS * SAMPLE_RATE;
     _numSamples = _totalFrames * NUM_CHANNELS;
     _numBytes = _numSamples * sizeof(SAMPLE);
-    _dataMyVoice.recordedSamples = (SAMPLE *)calloc(_numBytes, 1);
+    //_dataMyVoice.recordedSamples = (SAMPLE *)calloc(_numBytes, 1);
 
     _err = Pa_Initialize();
     if (_err != paNoError)
@@ -72,7 +72,7 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
     _outputParameters.suggestedLatency = _outputInfo->defaultHighInputLatency;
     _outputParameters.hostApiSpecificStreamInfo = nullptr;
 
-    _err = Pa_OpenStream(&_stream,
+    _err = Pa_OpenStream(&_streamMyVoice,
                          &_inputParameters,
                          nullptr,
                          SAMPLE_RATE,
@@ -82,11 +82,11 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
                          &network);
     if( _err != paNoError )
         exit(1);
-    _err = Pa_StartStream(_stream);
+    _err = Pa_StartStream(_streamMyVoice);
     if (_err != paNoError)
         exit(1);
     /*
-    while((_err = Pa_IsStreamActive(_stream)) == 1) {
+    while((_err = Pa_IsStreamActive(_streamMyVoice)) == 1) {
 //        Pa_Sleep(1000);
 
         printf("index = %d\n", _dataMyVoice.frameIndex ); fflush(stdout);
@@ -98,11 +98,6 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
 
 std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
 {
-    return std::pair<PaStream *,size_t>(_stream, 10000);
-    SAMPLE *copySample = _dataMyVoice.recordedSamples = (SAMPLE *)calloc(_numBytes, 1);
-    std::copy(_dataMyVoice.recordedSamples, _dataMyVoice.recordedSamples + _numBytes, copySample);
-    std::pair<unsigned char *, size_t> newSample(copySample, _dataMyVoice.frameIndex);
-    return newSample;
 }
 
 void babel::AudioWrapper::listenSound(const boost::any &reply)
@@ -112,6 +107,4 @@ void babel::AudioWrapper::listenSound(const boost::any &reply)
 
 void babel::AudioWrapper::clearBuffer()
 {
-    std::fill(_dataMyVoice.recordedSamples, _dataMyVoice.recordedSamples + _numBytes, 0);
-    _dataMyVoice.frameIndex = 0;
 }

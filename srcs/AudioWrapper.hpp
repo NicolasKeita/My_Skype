@@ -35,7 +35,8 @@ namespace babel {
         private:
             PaStreamParameters _inputParameters;
             PaStreamParameters _outputParameters;
-            PaStream            *_stream;
+            PaStream            *_streamMyVoice;
+            PaStream            *_streamTheirVoice;
             PaError             _err;
             const PaDeviceInfo  *_inputInfo;
             const PaDeviceInfo  *_outputInfo;
@@ -44,8 +45,6 @@ namespace babel {
             unsigned int        _numBytes;
             int                 _numChannels;
             unsigned int        _numSamples;
-            paTestData          _dataMyVoice;
-            paTestData          _dataTheirVoice;
             int                 _totalFrames;
             SAMPLE              max;
             SAMPLE              val;

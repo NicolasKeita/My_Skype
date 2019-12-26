@@ -55,10 +55,10 @@ void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & m
 //Blocking
 std::string uti::network::ClientUdpMultiThreadWrapper::getReply()
 {
-    char reply[1024];
+    char reply[4000];
     udp::endpoint sender_endpoint;
     size_t reply_length = _socket.receive_from(
-            boost::asio::buffer(reply, 1024),
+            boost::asio::buffer(reply, 4000),
             sender_endpoint); // blocking function
     //sender_endpoint is now equal to the server
     return std::string(reply, reply_length);
@@ -67,5 +67,4 @@ std::string uti::network::ClientUdpMultiThreadWrapper::getReply()
 void uti::network::ClientUdpMultiThreadWrapper::stop()
 {
     _socket.shutdown(boost::asio::ip::udp::socket::shutdown_both);
-//    this->_socket.close();
 }
