@@ -5,6 +5,7 @@
 #include <thread>
 #include "NetworkHandler.hpp"
 #include "ClientUdpMultiThreadWrapper.hpp"
+#include "AudioWrapper.hpp"
 
 void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddress,
                                                     unsigned int port)
@@ -16,8 +17,14 @@ void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddre
 void babel::NetworkHandler::_handleProtocolVOIP()
 {
     std::string messageToSend = "Hello world !";
+    AudioWrapper audio;
+
     while (true) {
-        _udp.sendMessage(messageToSend);
+        //auto input_voice = audio.recordInputVoice();
+        //_udp.sendMessage(input_voice);
+        //auto reply = _udp.getReply();
+        //audio.listenSound(reply);
+
     }
 }
 

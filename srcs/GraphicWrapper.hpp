@@ -9,6 +9,7 @@
 #define MY_BABEL_GRAPHICWRAPPER_HPP
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QDialog>
 #include "IGraphicWrapper.hpp"
 #include "ClientUdpMultiThreadWrapper.hpp"
@@ -28,6 +29,9 @@ namespace babel::graphic {
             void sound_test(); // TODO : remove
             QApplication        &_app;
             QWidget         _window;
+
+            QPushButton button;
+
             //babel::network::ClientWrapper   network;
     };
 }

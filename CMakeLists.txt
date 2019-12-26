@@ -19,7 +19,8 @@ add_executable(babel_client
         srcs/main.cpp
         srcs/NetworkHandler.cpp
         srcs/NetworkHandler.hpp
-        srcs/GraphicWrapper.cpp)
+        srcs/GraphicWrapper.cpp
+        srcs/AudioWrapper.cpp)
 
 target_compile_options(babel_client PRIVATE -fPIC -DQT_NO_VERSION_TAGGING)
 

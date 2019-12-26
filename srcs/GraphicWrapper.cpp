@@ -13,8 +13,19 @@
 #include "Exception.hpp"
 
 babel::graphic::GraphicWrapper::GraphicWrapper(QApplication &app)
-        : _app{ app }
-{}
+        : _app{ app },
+        button { "", &_window }
+{
+    QIcon icon(GREEN_PHONE);
+    button.setIcon(icon);
+    button.setGeometry(WIDTH_WIN / 2, HEIGHT_WIN / 2, 100, 100);
+    button.setIconSize(QSize(100, 100));
+
+    /*
+    QObject::connect(&button, &QAbstractButton::clicked,
+                     this, &babel::graphic::GraphicWrapper::sound_test);
+                     */
+}
 
 void babel::graphic::GraphicWrapper::setWindowSize(std::size_t width,
                                                    std::size_t height)
@@ -23,36 +34,13 @@ void babel::graphic::GraphicWrapper::setWindowSize(std::size_t width,
 }
 
 void babel::graphic::GraphicWrapper::createHomePage()
-{
-    int id = QFontDatabase::addApplicationFont(BASIC_FONT);
-    if (id == -1)
-        throw CannotLoadResource(BASIC_FONT);
-    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
-    QFont font(family, 10);
-    _app.setFont(font);
-    auto *button = new QPushButton("", &_window);
-    QIcon icon(GREEN_PHONE);
-    button->setIcon(icon);
-    button->setGeometry(WIDTH_WIN / 2, HEIGHT_WIN / 2, 100, 100);
-    button->setIconSize(QSize(100, 100));
-
-    //Quand le bouton est appuyé, soundDemonstration() est appelé
-    QObject::connect(button, &QAbstractButton::clicked,
-            this, &babel::graphic::GraphicWrapper::sound_test);
-    QObject::connect(button, &QAbstractButton::clicked,
-                     this, &babel::graphic::GraphicWrapper::sound_test);
-//    clientNetwork.connectToHost("0.0.0.0", 42424, &handleMessageReceived);
-}
+{}
 
 void babel::graphic::GraphicWrapper::createPhoneCallPage()
-{
-
-}
+{}
 
 void babel::graphic::GraphicWrapper::deletePage()
-{
-    //_window.clear();
-}
+{}
 
 
 
@@ -73,8 +61,6 @@ static const int SAMPLE_RATE = 44100;
 #define NUM_CHANNELS		2
 #define FRAME_SIZE			960
 
-std::string handleMessageReceived(const std::string &msgReceived);
-
 void babel::graphic::GraphicWrapper::sound_test()
 {
     auto err = Pa_Initialize();
@@ -82,10 +68,11 @@ void babel::graphic::GraphicWrapper::sound_test()
     {
         std::cerr << "Error: Initialization failed: " << Pa_GetErrorText(err) << std::endl;
         exit(43);
-    } else {
+    }
+    else
+    {
         std::cout << "everything is good " << std::endl;
         PaStreamParameters inputParameters;
-        PaStreamParameters outputParameters;
 
         if ((inputParameters.device = Pa_GetDefaultInputDevice()) == paNoDevice) {
             std::cerr << "Error: No default input device." << std::endl;
@@ -97,9 +84,14 @@ void babel::graphic::GraphicWrapper::sound_test()
                 LATENCY_CONSTANT * Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency;
         inputParameters.hostApiSpecificStreamInfo = nullptr;
 
+
+        PaStreamParameters outputParameters;
+
         if ((outputParameters.device = Pa_GetDefaultOutputDevice()) == paNoDevice) {
             std::cerr << "Error: No default output device." << std::endl;
             exit(67);
+        } else {
+            std::cout << "[debug graphicwrapper] output device found !" << std::endl;
         }
         outputParameters.channelCount = NUM_CHANNELS;
         outputParameters.sampleFormat = paFloat32;

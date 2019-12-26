@@ -1,6 +1,7 @@
 #include <QtWidgets/QApplication>
 #include "GraphicWrapper.hpp"
 #include "NetworkHandler.hpp"
+#include "Macro.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -12,7 +13,7 @@ int main(int argc, char *argv[])
     QApplication                    app(argc, argv);
     babel::graphic::GraphicWrapper  clientWrapper(app);
 
-    clientWrapper.setWindowSize(1920, 1080);
+    clientWrapper.setWindowSize(WIDTH_WIN, HEIGHT_WIN);
     clientWrapper.createHomePage();
     clientWrapper.showPage();
     //QApplication::exec();
