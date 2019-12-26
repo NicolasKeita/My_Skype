@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     clientWrapper.setWindowSize(1920, 1080);
     clientWrapper.createHomePage();
     clientWrapper.showPage();
+    //QApplication::exec();
     app.exec();
 
     network.stopCurrentCommunication();
