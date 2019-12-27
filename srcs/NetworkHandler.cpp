@@ -13,7 +13,6 @@ void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddre
                                                     unsigned int port)
 {
     _udp.setServer(hostAddress, port);
-    _udp.getReply();
 
     _audio = std::make_unique<babel::AudioWrapper>(*this);
     //this->_handleProtocolVOIP();

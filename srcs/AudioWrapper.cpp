@@ -57,7 +57,7 @@ static int recordCallback( const void *inputBuffer, void *outputBuffer,
          //    dataToSend.insert(dataToSend.end(), rptr, rptr + framesPerBuffer * NUM_CHANNELS);
      }
      //std::cerr << "Callback called" << std::endl;
-     //data->sendMessage(std::string(dataToSend.begin(), dataToSend.end()));
+     data->sendMessage(std::string(dataToSend.begin(), dataToSend.end()));
      return paContinue;
  }
 
@@ -143,10 +143,11 @@ void babel::AudioWrapper::listenSound()
         exit(1);
         */
     //_err = Pa_IsStreamActive(_streamMyVoice)
+    std::vector<float> buffer(FRAMES_PER_BUFFER);
     while (Pa_IsStreamActive(_streamMyVoice)) {
         std::string msg = network.getMessage();
-        std::cerr << "Message " << msg << std::endl;
         Pa_WriteStream(_streamMyVoice, msg.c_str(), msg.size());
+        Pa_ReadStream(_streamMyVoice, buffer.data(), msg.size() / NUM_CHANNELS);
     }
     //_err = Pa_ReadStream(_streamTheirVoice, _buffer.data(), FRAME_SIZE / NUM_CHANNELS)) != paNoError) {
 
