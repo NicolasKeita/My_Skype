@@ -27,7 +27,7 @@ namespace uti::network {
 
         private:
             boost::asio::io_context                         _io_context;
-            boost::asio::ip::udp::socket                    _socket;
+            std::unique_ptr<boost::asio::ip::udp::socket>   _socket;
             boost::asio::ip::udp::resolver                  _resolver;
             boost::asio::ip::udp::resolver::results_type    _endpoints;
             std::string             _serverAddress;

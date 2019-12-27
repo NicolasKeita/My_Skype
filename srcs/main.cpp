@@ -6,8 +6,8 @@
 int main(int argc, char *argv[])
 {
     babel::NetworkHandler   network;
-    network.startVoiceCommunication("127.0.0.1",
-                                    42424);
+    network.startVoiceCommunication("0.0.0.0",
+                                    std::stoi(argv[1]));
 
     // Graphic
     QApplication                    app(argc, argv);

@@ -56,14 +56,21 @@ static int recordCallback( const void *inputBuffer, void *outputBuffer,
          //if (NUM_CHANNELS == 2)
          //    dataToSend.insert(dataToSend.end(), rptr, rptr + framesPerBuffer * NUM_CHANNELS);
      }
-     data->sendMessage(std::string(dataToSend.begin(), dataToSend.end()));
+     //std::cerr << "Callback called" << std::endl;
+     //data->sendMessage(std::string(dataToSend.begin(), dataToSend.end()));
      return paContinue;
  }
 
 babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
-        : _streamMyVoice { nullptr },
+        : _inputParameters { 0, 0, 0, 0, nullptr },
+          _outputParameters { 0, 0, 0, 0, nullptr },
+          _streamMyVoice { nullptr },
           _streamTheirVoice { nullptr },
           _sampleBlock { nullptr },
+          _i { 0 },
+          max( 0 ),
+          val { 0 },
+          average { 0.0f },
           network { network }
 {
     // maxFrameIndex = NUM_SECONDS * SAMPLE_RATE;
@@ -73,8 +80,10 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
     //_dataMyVoice.recordedSamples = (SAMPLE *)calloc(_numBytes, 1);
 
     _err = Pa_Initialize();
-    if (_err != paNoError)
+    if (_err != paNoError) {
+        std::cerr << Pa_GetErrorText(_err) << std::endl;
         exit(1);
+    }
     _inputParameters.device = Pa_GetDefaultInputDevice();
     _inputInfo = Pa_GetDeviceInfo(_inputParameters.device);
 
@@ -96,14 +105,15 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
 
     _err = Pa_OpenStream(&_streamMyVoice,
                          &_inputParameters,
-                         nullptr,
+                         &_outputParameters,
                          SAMPLE_RATE,
                          FRAMES_PER_BUFFER,
                          paClipOff,
                          recordCallback,
                          &network);
     if( _err != paNoError )
-        exit(1);
+        exit(2);
+    /*
     _err = Pa_OpenStream(&_streamTheirVoice,
                          nullptr,
                          &_outputParameters,
@@ -113,25 +123,30 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
                          playCallback,
                          &network);
     if( _err != paNoError )
-        exit(1);
+        exit(3);*/
 }
 
 std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
 {
     _err = Pa_StartStream(_streamMyVoice);
-    if (_err != paNoError)
-        exit(1);
+    if (_err != paNoError) {
+        std::cerr << Pa_GetErrorText(_err) << std::endl;
+        exit(5);
+    }
 }
 
 void babel::AudioWrapper::listenSound()
 {
+    /*
     _err = Pa_StartStream(_streamTheirVoice);
     if (_err != paNoError)
         exit(1);
-    while (Pa_IsStreamActive(_streamTheirVoice)) {
-        std::cerr << "LOCK ----------- " << std::endl;
+        */
+    //_err = Pa_IsStreamActive(_streamMyVoice)
+    while (Pa_IsStreamActive(_streamMyVoice)) {
         std::string msg = network.getMessage();
-        //Pa_WriteStream(_stream, msg.c_str(), msg.size());
+        std::cerr << "Message " << msg << std::endl;
+        Pa_WriteStream(_streamMyVoice, msg.c_str(), msg.size());
     }
     //_err = Pa_ReadStream(_streamTheirVoice, _buffer.data(), FRAME_SIZE / NUM_CHANNELS)) != paNoError) {
 

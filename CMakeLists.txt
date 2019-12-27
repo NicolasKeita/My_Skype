@@ -38,6 +38,6 @@ target_link_libraries(babel_client PRIVATE
         Qt5::Widgets)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-    target_compile_options(babel_client PRIVATE -Wall -Wextra -fPIC -DQT_NO_VERSION_TAGGING)
+    target_compile_options(babel_client PRIVATE -Wall -Wextra -fPIC -DQT_NO_VERSION_TAGGING -g3)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
