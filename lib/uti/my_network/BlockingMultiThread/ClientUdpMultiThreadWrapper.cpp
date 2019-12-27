@@ -36,8 +36,7 @@ void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & m
         std::cerr << "[Network ClientUdpMultiThread] Where to send ? You first have to set a host" << std::endl;
         return;
     }
-    std::string message_cast = boost::any_cast<std::string>(message);
-    std::cout << "Messagel ength : " << messageLength << std::endl;
+    unsigned char * message_cast = boost::any_cast<unsigned char *>(message);
 
     _socket->send_to(boost::asio::buffer(message_cast,
                                         messageLength),
@@ -47,11 +46,10 @@ void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & m
 //Blocking
 std::string uti::network::ClientUdpMultiThreadWrapper::getReply()
 {
-    std::cout << "Getting reply" << std::endl;
-    char reply[4000];
+    char reply[10000];
     udp::endpoint sender_endpoint;
     size_t reply_length = _socket->receive_from(
-            boost::asio::buffer(reply, 4000),
+            boost::asio::buffer(reply, 10000),
             sender_endpoint); // blocking function
     //sender_endpoint is now equal to the server
     return std::string(reply, reply_length);

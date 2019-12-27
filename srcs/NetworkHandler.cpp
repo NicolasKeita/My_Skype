@@ -4,6 +4,7 @@
 
 #include <portaudio.h>
 #include <thread>
+#include <vector>
 #include <string>
 #include "NetworkHandler.hpp"
 #include "ClientUdpMultiThreadWrapper.hpp"
@@ -23,8 +24,26 @@ void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddre
 void babel::NetworkHandler::_handleProtocolVOIP()
 {
    // _thread = std::thread(&babel::AudioWrapper::recordInputVoice, _audio);
-    _audio->recordInputVoice();
-    _audio->listenSound();
+    //_audio->recordInputVoice();
+    std::thread thread([&]() {
+        while (true) {
+            auto record = _audio->getRecord();
+            record.at(0) = 1;
+            _udp.sendMessage(record.data(), record.size());
+        }
+    });
+    thread.detach();
+
+    std::thread thread2([&](){
+       while (true) {
+            std::string record2 = _udp.getReply();
+            //exit(23);
+            std::vector<unsigned char> record_cast(record2.begin(), record2.end());
+            _audio->playRecord(record_cast);
+       }
+    });
+    thread2.detach();
+    //_audio->listenSound();
     // Sending voiceData async automatically
     //AudioWrapper audio(*this);
 

@@ -23,7 +23,15 @@ namespace babel {
 
             std::pair<PaStream *,size_t> recordInputVoice();
             void listenSound();
+            void playRecord(std::vector<unsigned char> &record);
             void clearBuffer();
+            void restartStream();
+            void startStream();
+            void closeStream();
+            void stopStream();
+            void stopRecording();
+            void startRecording();
+            std::vector<unsigned char> getRecord();
 
         private:
             PaStreamParameters _inputParameters;
@@ -43,10 +51,15 @@ namespace babel {
             SAMPLE              val;
             double              average;
             NetworkHandler      &network;
+            bool                _streaming;
+            bool _recording;
+            uint32_t            _channel;
+            uint32_t            _bufferSize;
+            uint32_t            _sampleRate;
 
         public:
             static constexpr int SAMPLE_RATE = 44100;
-            static constexpr int FRAMES_PER_BUFFER = 10000;
+            static constexpr int FRAMES_PER_BUFFER = 1024;
             static constexpr int NUM_SECONDS = 10; // Temps du recording
             static constexpr int DITHER_FLAG = 0;
 
