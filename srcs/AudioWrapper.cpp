@@ -5,6 +5,7 @@
 #include <boost/any.hpp>
 #include <cstdlib>
 #include "AudioWrapper.hpp"
+#include "NetworkHandler.hpp"
 
 static int playCallback( const void *inputBuffer, void *outputBuffer,
                            unsigned long framesPerBuffer,
@@ -12,7 +13,8 @@ static int playCallback( const void *inputBuffer, void *outputBuffer,
                            PaStreamCallbackFlags statusFlags,
                            void *userData )
 {
-    (void) inputBuffer; /* Prevent unused variable warnings. */
+    /*
+    (void) inputBuffer;
     (void) timeInfo;
     (void) statusFlags;
 
@@ -20,8 +22,9 @@ static int playCallback( const void *inputBuffer, void *outputBuffer,
     const auto *outPtr = (const SAMPLE*)outputBuffer;
 
     // TODO
-   // auto = network->getMessage();
-   // _err = Pa_WriteStream(_streamTheirVoice, )
+   auto r = network->getMessage();
+   _err = Pa_WriteStream(_streamTheirVoice, )
+           */
 }
 
 static int recordCallback( const void *inputBuffer, void *outputBuffer,
@@ -120,11 +123,15 @@ std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
         exit(1);
 }
 
-void babel::AudioWrapper::listenSound(const boost::any &reply)
+void babel::AudioWrapper::listenSound()
 {
     _err = Pa_StartStream(_streamTheirVoice);
     if (_err != paNoError)
         exit(1);
+    while (true) {
+        std::string msg = network.getMessage();
+        Pa_WriteStream(_streamTheirVoice, msg.c_str(), msg.size());
+    }
 }
 
 void babel::AudioWrapper::clearBuffer()

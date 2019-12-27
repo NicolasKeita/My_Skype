@@ -7,7 +7,6 @@
 
 #include <boost/any.hpp>
 #include "portaudio.h"
-#include "NetworkHandler.hpp"
 
 #define PA_SAMPLE_TYPE  paFloat32
 #define PRINTF_S_FORMAT "%.8f"
@@ -17,13 +16,13 @@ using SAMPLE = unsigned char;
 #define SAMPLE_SILENCE (0.0f)
 
 namespace babel {
+    class NetworkHandler;
     class AudioWrapper {
         public:
-            AudioWrapper(NetworkHandler &network);
+            explicit AudioWrapper(NetworkHandler &network);
 
-            //std::pair<unsigned char *, size_t> recordInputVoice();
             std::pair<PaStream *,size_t> recordInputVoice();
-            void listenSound(const boost::any &reply);
+            void listenSound();
             void clearBuffer();
 
         private:

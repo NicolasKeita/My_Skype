@@ -13,12 +13,15 @@ void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddre
                                                     unsigned int port)
 {
     _udp.setServer(hostAddress, port);
-    AudioWrapper audio(*this);
+
+    _audio = std::make_unique<babel::AudioWrapper>(*this);
+    //AudioWrapper audio(*this);
     //_thread = std::thread(&babel::NetworkHandler::_handleProtocolVOIP, this);
 }
 
 void babel::NetworkHandler::_handleProtocolVOIP()
 {
+
     // Sending voiceData async automatically
     //AudioWrapper audio(*this);
 
@@ -33,4 +36,9 @@ void babel::NetworkHandler::stopCurrentCommunication()
 void babel::NetworkHandler::sendMessage(const std::string &msg)
 {
     _udp.sendMessage(msg, msg.size());
+}
+
+std::string babel::NetworkHandler::getMessage()
+{
+    return _udp.getReply();
 }

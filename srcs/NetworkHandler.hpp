@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include "ClientUdpMultiThreadWrapper.hpp"
+#include "AudioWrapper.hpp"
 
 namespace babel {
     class NetworkHandler {
@@ -19,6 +20,7 @@ namespace babel {
                                          unsigned int port);
             void stopCurrentCommunication();
             void sendMessage(const std::string &msg);
+            std::string getMessage();
 
         private:
             void _handleProtocolVOIP();
@@ -26,6 +28,7 @@ namespace babel {
         private:
             uti::network::ClientUdpMultiThreadWrapper   _udp;
             std::thread                                 _thread;
+            std::unique_ptr<AudioWrapper>                   _audio;
     };
 }
 
