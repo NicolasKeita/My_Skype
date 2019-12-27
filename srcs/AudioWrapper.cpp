@@ -40,6 +40,7 @@ static int recordCallback( const void *inputBuffer, void *outputBuffer,
      (void) timeInfo;
      (void) statusFlags;
 
+     /*
      std::vector<SAMPLE> dataToSend(framesPerBuffer * NUM_CHANNELS, SAMPLE_SILENCE);
      if (!inputBuffer)
      {
@@ -58,6 +59,7 @@ static int recordCallback( const void *inputBuffer, void *outputBuffer,
      }
      //std::cerr << "Callback called" << std::endl;
      data->sendMessage(std::string(dataToSend.begin(), dataToSend.end()));
+      */
      return paContinue;
  }
 
@@ -100,31 +102,34 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
 
     _outputParameters.channelCount = _numChannels;
     _outputParameters.sampleFormat = PA_SAMPLE_TYPE;
-    _outputParameters.suggestedLatency = _outputInfo->defaultHighInputLatency;
+    _outputParameters.suggestedLatency = _outputInfo->defaultLowOutputLatency;
+    //_outputParameters.suggestedLatency = _outputInfo->defaultHighOutputLatency;
     _outputParameters.hostApiSpecificStreamInfo = nullptr;
 
     _err = Pa_OpenStream(&_streamMyVoice,
                          &_inputParameters,
-                         &_outputParameters,
+                         nullptr,
                          SAMPLE_RATE,
                          FRAMES_PER_BUFFER,
                          paClipOff,
-                         recordCallback,
+                         nullptr,
                          &network);
     if( _err != paNoError )
         exit(2);
-    /*
     _err = Pa_OpenStream(&_streamTheirVoice,
                          nullptr,
                          &_outputParameters,
                          SAMPLE_RATE,
                          FRAMES_PER_BUFFER,
                          paClipOff,
-                         playCallback,
+                         nullptr,
                          &network);
     if( _err != paNoError )
-        exit(3);*/
+        exit(3);
 }
+
+
+#include <thread>
 
 std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
 {
@@ -133,28 +138,52 @@ std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
         std::cerr << Pa_GetErrorText(_err) << std::endl;
         exit(5);
     }
+
+    std::thread thread([&]() {
+        std::mutex mutex;
+        std::vector<float> buffer(FRAMES_PER_BUFFER * 1000, 0);
+        while (Pa_IsStreamActive(_streamMyVoice)) {
+            mutex.lock();
+//            if (Pa_GetStreamReadAvailable(_streamTheirVoice) >= 0) {
+                _err = Pa_ReadStream(_streamMyVoice, buffer.data(), FRAMES_PER_BUFFER);
+                if (_err != paNoError) {
+                    std::cerr << Pa_GetErrorText(_err) << std::endl;
+                    exit(7);
+                }
+                network.sendMessage(std::string(buffer.begin(), buffer.end()), FRAMES_PER_BUFFER);
+ //           }
+            mutex.unlock();
+        }
+    });
+    thread.detach();
 }
 
 void babel::AudioWrapper::listenSound()
 {
-    /*
     _err = Pa_StartStream(_streamTheirVoice);
-    if (_err != paNoError)
-        exit(1);
-        */
-    //_err = Pa_IsStreamActive(_streamMyVoice)
-    std::vector<float> buffer(FRAMES_PER_BUFFER);
-    while (Pa_IsStreamActive(_streamMyVoice)) {
-        std::string msg = network.getMessage();
-        Pa_WriteStream(_streamMyVoice, msg.c_str(), msg.size());
-        Pa_ReadStream(_streamMyVoice, buffer.data(), msg.size() / NUM_CHANNELS);
-    }
-    //_err = Pa_ReadStream(_streamTheirVoice, _buffer.data(), FRAME_SIZE / NUM_CHANNELS)) != paNoError) {
-
-
+    if (_err != paNoError) {
+        std::cerr << Pa_GetErrorText(_err) << std::endl;
+        exit(6);
     }
 
-    void babel::AudioWrapper::clearBuffer()
+    std::thread thread([&]() {
+        std::vector<unsigned char> buffer(FRAMES_PER_BUFFER * 1000);
+        std::mutex mutex;
+        while (Pa_IsStreamActive(_streamTheirVoice)) {
+            mutex.lock();
+                std::string msg = network.getMessage();
+                _err = Pa_WriteStream(_streamTheirVoice, msg.c_str(), msg.size());
+                if (_err != paNoError) {
+                    std::cerr << Pa_GetErrorText(_err) << std::endl;
+                    exit(8);
+                }
+            mutex.unlock();
+        }
+    });
+    thread.detach();
+}
+
+void babel::AudioWrapper::clearBuffer()
 {
     _err = Pa_StartStream(_streamTheirVoice);
     if (_err != paNoError)

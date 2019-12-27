@@ -46,11 +46,11 @@ namespace babel {
 
         public:
             static constexpr int SAMPLE_RATE = 44100;
-            static constexpr int FRAMES_PER_BUFFER = 512;
+            static constexpr int FRAMES_PER_BUFFER = 10000;
             static constexpr int NUM_SECONDS = 10; // Temps du recording
             static constexpr int DITHER_FLAG = 0;
 
-            static constexpr int SAMPLE_SIZE = 4;
+            //static constexpr int SAMPLE_SIZE = 4;
     };
 }
 

@@ -19,7 +19,7 @@ namespace babel {
             void startVoiceCommunication(const std::string &hostAddress,
                                          unsigned int port);
             void stopCurrentCommunication();
-            void sendMessage(const std::string &msg);
+            void sendMessage(const std::string &msg, size_t msgLength);
             std::string getMessage();
 
         private:
