@@ -46,6 +46,7 @@ void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & m
     //const std::string message_cast = boost::any_cast<const std::string>(message);
     //unsigned char *message_cast = boost::any_cast<unsigned char *>(message);
     std::string message_cast = boost::any_cast<std::string>(message);
+    std::cout << "Messagel ength : " << messageLength << std::endl;
 
     _socket.send_to(boost::asio::buffer(message_cast,
                                         messageLength),

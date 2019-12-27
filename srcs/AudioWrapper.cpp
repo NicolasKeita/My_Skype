@@ -128,13 +128,17 @@ void babel::AudioWrapper::listenSound()
     _err = Pa_StartStream(_streamTheirVoice);
     if (_err != paNoError)
         exit(1);
-    while (true) {
+    while (Pa_IsStreamActive(_streamTheirVoice)) {
+        std::cerr << "LOCK ----------- " << std::endl;
         std::string msg = network.getMessage();
-        Pa_WriteStream(_streamTheirVoice, msg.c_str(), msg.size());
+        //Pa_WriteStream(_stream, msg.c_str(), msg.size());
     }
-}
+    //_err = Pa_ReadStream(_streamTheirVoice, _buffer.data(), FRAME_SIZE / NUM_CHANNELS)) != paNoError) {
 
-void babel::AudioWrapper::clearBuffer()
+
+    }
+
+    void babel::AudioWrapper::clearBuffer()
 {
     _err = Pa_StartStream(_streamTheirVoice);
     if (_err != paNoError)
