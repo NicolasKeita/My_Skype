@@ -12,7 +12,17 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+
+#include <boost/serialization/vector.hpp>
+
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_woarchive.hpp> // saving
+#include <boost/archive/text_wiarchive.hpp> // loading
+
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
+
 #include "IClientUdpMultiThreadWrapper.hpp"
 
 namespace uti::network {
@@ -31,11 +41,28 @@ namespace uti::network {
                 }
                 //unsigned char * message_cast = boost::any_cast<unsigned char *>(message);
 
-                char *message_cast = "HEllo world";
+                // Serialization
+                std::ostringstream archive_stream;
+                boost::archive::text_oarchive archive(archive_stream);
+                archive << message;
+                std::string message_serialized = archive_stream.str();
 
-                _socket->send_to(boost::asio::buffer(message_cast,
-                                                     messageLength),
-                                 *_endpoints.begin());
+                // Header creation
+                std::ostringstream  header_stream;
+                header_stream << std::setw(_header_length) \
+                    << std::hex << message_serialized.size();
+                if (!header_stream || header_stream.str().size() != _header_length) {
+                    std::cerr << "[CLientUdpMultiThread] Serialization Object went wrong" << std::endl;
+                    exit(84);
+                }
+                std::string header = header_stream.str();
+
+                // Merge
+                std::vector<boost::asio::const_buffer> buffers;
+                buffers.push_back(boost::asio::buffer(header));
+                buffers.push_back(boost::asio::buffer(message_serialized));
+
+                _socket->send_to(buffers, *_endpoints.begin());
             }
 
             template<class T>
@@ -62,6 +89,7 @@ namespace uti::network {
             std::string             _serverAddress;
             size_t                  _port;
             bool                    _serverSet;
+            size_t                  _header_length;
     };
 }
 

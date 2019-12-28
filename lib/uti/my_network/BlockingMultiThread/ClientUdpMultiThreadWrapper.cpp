@@ -14,7 +14,8 @@ uti::network::ClientUdpMultiThreadWrapper::ClientUdpMultiThreadWrapper()
         : _resolver { _io_context },
           _serverAddress { "-1" },
           _port { 0 },
-          _serverSet { false }
+          _serverSet { false },
+          _header_length { 8 }
 {}
 
 void uti::network::ClientUdpMultiThreadWrapper::setServer(const std::string &serverAddress,

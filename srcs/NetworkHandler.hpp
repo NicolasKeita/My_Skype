@@ -8,8 +8,12 @@
 #include <thread>
 #include <memory>
 #include <string>
-#include "ClientUdpMultiThreadWrapper.hpp"
+#include <ClientUdpMultiThreadWrapper.hpp>
 #include "AudioWrapper.hpp"
+
+namespace uti::network {
+    class ClientUdpMultiThreadWrapper;
+}
 
 namespace babel {
     class NetworkHandler {
@@ -38,7 +42,7 @@ namespace babel {
         private:
             uti::network::ClientUdpMultiThreadWrapper   _udp;
             std::thread                                 _thread;
-            std::unique_ptr<AudioWrapper>                   _audio;
+            std::unique_ptr<AudioWrapper>               _audio;
     };
 }
 

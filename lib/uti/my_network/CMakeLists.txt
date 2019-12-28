@@ -12,16 +12,14 @@ if (CONAN_BOOST_ROOT)
 endif(CONAN_BOOST_ROOT)
 
 if (DEFINED ENV{BOOST_ROOT})
-    message("HEREEE --- ")
     set(Boost_NO_SYSTEM_PATHS TRUE)
     set(BOOST_ROOT $ENV{BOOST_ROOT})
     set(BOOST_INCLUDE_DIRS "${BOOST_ROOT}/include")
     set(BOOST_LIBRARY_DIRS "${BOOST_ROOT}/lib")
 endif()
 
-find_package(Boost 1.69.0 REQUIRED)
+find_package(Boost COMPONENTS serialization REQUIRED)
 find_package(Threads REQUIRED)
-include_directories(${BOOST_INCLUDE_DIRS})
 
 add_library(my_network STATIC
         Async/ServerTcpAsyncWrapper.cpp
@@ -31,6 +29,7 @@ add_library(my_network STATIC
 
 target_include_directories(my_network PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${BOOST_INCLUDE_DIRS}
         ./../my_string/
         Async
         BlockingMultiThread)

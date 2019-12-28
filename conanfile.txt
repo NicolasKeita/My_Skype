@@ -1,7 +1,10 @@
 [requires]
-boost/1.69.0@conan/stable
 portaudio/v190600.20161030@bincrafters/stable
 qt/5.14.0@bincrafters/stable
+boost/1.71.0@conan/stable
+zlib/1.2.11@conan/stable
+bzip2/1.0.8@conan/stable
+#expat/2.2.5@bincrafters/stable
 
 [build_requires]
 
@@ -9,6 +12,7 @@ qt/5.14.0@bincrafters/stable
 boost:shared=False
 qt:shared=False
 portaudio:shared=False
+#expat:shared=True
 
 [generators]
 cmake

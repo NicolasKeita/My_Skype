@@ -2,12 +2,10 @@
 // Created by spynight on 12/25/19.
 //
 
-#include <portaudio.h>
 #include <thread>
 #include <vector>
 #include <string>
 #include "NetworkHandler.hpp"
-#include "ClientUdpMultiThreadWrapper.hpp"
 #include "AudioWrapper.hpp"
 
 void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddress,
@@ -24,7 +22,7 @@ void babel::NetworkHandler::_handleProtocolVOIP()
     std::thread thread([&]() {
         while (true) {
             std::vector<float> record = _audio->getRecord();
-            _udp.sendMessage<std::vector<float, std::allocator<float>>>(record, record.size());
+            _udp.sendMessage<std::vector<float>>(record, record.size());
             if (true)
                 break;
         }

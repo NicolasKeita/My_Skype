@@ -12,30 +12,32 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Portaudio REQUIRED)
+find_package(Boost COMPONENTS serialization REQUIRED)
 
 add_subdirectory("${CMAKE_HOME_DIRECTORY}/lib/uti/my_network")
 
 add_executable(babel_client
         srcs/main.cpp
         srcs/NetworkHandler.cpp
-        srcs/NetworkHandler.hpp
         srcs/GraphicWrapper.cpp
         srcs/AudioWrapper.cpp)
 
-target_compile_options(babel_client PRIVATE -fPIC -DQT_NO_VERSION_TAGGING)
-
-target_include_directories(babel_client PRIVATE
+target_include_directories(babel_client PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/uti/my_network/BlockingMultiThread
         ${CONAN_INCLUDE_DIRS})
 
-target_link_directories(babel_client PRIVATE
+target_link_directories(babel_client PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/uti/my_network
-        ${CONAN_LIB_DIRS})
+        #${CONAN_LIB_DIRS}
+        )
 
-target_link_libraries(babel_client PRIVATE
-        my_network
+target_link_libraries(babel_client PUBLIC
+#        ${CONAN_LIBS_QT5}
+        Qt5::Widgets
         ${CONAN_LIBS_PORTAUDIO}
-        Qt5::Widgets)
+        ${Boost_LIBRARIES}
+        my_network
+        )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     target_compile_options(babel_client PRIVATE -Wall -Wextra -fPIC -DQT_NO_VERSION_TAGGING -g3)
