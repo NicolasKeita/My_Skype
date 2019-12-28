@@ -4,6 +4,7 @@
 
 #include <boost/any.hpp>
 #include <cstdlib>
+#include <vector>
 #include <time.h>
 #include "AudioWrapper.hpp"
 #include "NetworkHandler.hpp"
