@@ -139,6 +139,7 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
 
 std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
 {
+    /*
     _err = Pa_StartStream(_streamMyVoice);
     if (_err != paNoError) {
         std::cerr << Pa_GetErrorText(_err) << std::endl;
@@ -166,10 +167,12 @@ std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
         }
     });
     thread.detach();
+     */
 }
 
 void babel::AudioWrapper::listenSound()
 {
+    /*
     _err = Pa_StartStream(_streamTheirVoice);
     if (_err != paNoError) {
         std::cerr << Pa_GetErrorText(_err) << std::endl;
@@ -195,16 +198,21 @@ void babel::AudioWrapper::listenSound()
         }
     });
     thread.detach();
+     */
 }
 
 void babel::AudioWrapper::playRecord(std::vector<float> &record)
 {
     PaError paErr;
-    while (Pa_GetStreamWriteAvailable(_streamMyVoice) < (long)record.size());
-    paErr = Pa_WriteStream(_streamMyVoice, record.data(),
-                           (unsigned long)record.size());
-    if (paErr != paNoError)
-        this->restartStream();
+    long streamWriteAvailable = 0;
+    while (streamWriteAvailable < (long)record.size()) {
+        streamWriteAvailable = Pa_GetStreamReadAvailable(_streamMyVoice);
+        //while (Pa_GetStreamWriteAvailable(_streamMyVoice) < (long)record.size());
+        paErr = Pa_WriteStream(_streamMyVoice, record.data(),
+                               (unsigned long) record.size());
+        if (paErr != paNoError)
+            this->restartStream();
+    }
 }
 
 void babel::AudioWrapper::clearBuffer()
@@ -227,7 +235,7 @@ void babel::AudioWrapper::startStream()
             &_streamMyVoice,
             _channel,
             _channel, paFloat32, SAMPLE_RATE,
-            _bufferSize, nullptr, nullptr);
+            FRAMES_PER_BUFFER, nullptr, nullptr);
     if (paErr != paNoError) {
         std::cerr << Pa_GetErrorText(paErr) << std::endl;
         exit(6);
@@ -277,13 +285,13 @@ std::vector<float> babel::AudioWrapper::getRecord()
 {
     PaError paErr;
     long streamReadAvailable = Pa_GetStreamReadAvailable(_streamMyVoice);
-    std::vector<float> record(_bufferSize);
-    if (streamReadAvailable < (long)_bufferSize)
+    std::vector<float> record(FRAMES_PER_BUFFER);
+    if (streamReadAvailable < (long)FRAMES_PER_BUFFER)
         paErr = Pa_ReadStream(
                 _streamMyVoice, record.data(),
                 (unsigned long)streamReadAvailable);
     else
-        paErr = Pa_ReadStream(_streamMyVoice, record.data(), _bufferSize);
+        paErr = Pa_ReadStream(_streamMyVoice, record.data(), FRAMES_PER_BUFFER);
     if (paErr != paNoError)
         restartStream();
     return record;
