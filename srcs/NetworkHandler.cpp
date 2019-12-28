@@ -27,19 +27,23 @@ void babel::NetworkHandler::_handleProtocolVOIP()
     //_audio->recordInputVoice();
     std::thread thread([&]() {
         while (true) {
-            auto record = _audio->getRecord();
+            std::vector<float> record = _audio->getRecord();
             record.at(0) = 1;
-            _udp.sendMessage(record.data(), record.size());
+            _udp.sendMessage<std::vector<float, std::allocator<float>>>(record, record.size());
+            if (true)
+                break;
         }
     });
     thread.detach();
 
     std::thread thread2([&](){
        while (true) {
-            std::string record2 = _udp.getReply();
+            std::vector<float> record2 = _udp.getReply<std::vector<float>>();
             //exit(23);
-            std::vector<unsigned char> record_cast(record2.begin(), record2.end());
+            std::vector<float> record_cast(record2.begin(), record2.end());
             _audio->playRecord(record_cast);
+            if (true)
+                break;
        }
     });
     thread2.detach();
@@ -55,12 +59,15 @@ void babel::NetworkHandler::stopCurrentCommunication()
     //_thread.join();
 }
 
-void babel::NetworkHandler::sendMessage(const std::string &msg, size_t msgLength)
+/*
+template<class T>
+void babel::NetworkHandler::sendMessage(const T &msg, size_t msgLength)
 {
-    _udp.sendMessage(msg, msgLength);
+    _udp.sendMessage<T>(msg, msgLength);
 }
 
-std::string babel::NetworkHandler::getMessage()
+template<class T>
+T babel::NetworkHandler::getMessage()
 {
-    return _udp.getReply();
-}
+    return _udp.getReply<T>();
+}*/

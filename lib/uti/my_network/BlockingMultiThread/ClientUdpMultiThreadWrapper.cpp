@@ -30,21 +30,27 @@ void uti::network::ClientUdpMultiThreadWrapper::setServer(const std::string &ser
     _serverSet = true;
 }
 
-void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const boost::any & message, size_t messageLength)
+/*
+template<class T>
+void uti::network::ClientUdpMultiThreadWrapper::sendMessage(const T & message, size_t messageLength)
 {
     if (!_serverSet) {
         std::cerr << "[Network ClientUdpMultiThread] Where to send ? You first have to set a host" << std::endl;
         return;
     }
-    unsigned char * message_cast = boost::any_cast<unsigned char *>(message);
+    //unsigned char * message_cast = boost::any_cast<unsigned char *>(message);
+
+    char *message_cast = "HEllo world";
 
     _socket->send_to(boost::asio::buffer(message_cast,
                                         messageLength),
                     *_endpoints.begin());
-}
+}*/
 
 //Blocking
-std::string uti::network::ClientUdpMultiThreadWrapper::getReply()
+/*
+template<class T>
+T uti::network::ClientUdpMultiThreadWrapper::getReply()
 {
     char reply[10000];
     udp::endpoint sender_endpoint;
@@ -52,8 +58,10 @@ std::string uti::network::ClientUdpMultiThreadWrapper::getReply()
             boost::asio::buffer(reply, 10000),
             sender_endpoint); // blocking function
     //sender_endpoint is now equal to the server
-    return std::string(reply, reply_length);
-}
+//    return std::string(reply, reply_length);
+    std::vector<float> array(10, 1);
+    return array;
+}*/
 
 void uti::network::ClientUdpMultiThreadWrapper::stop()
 {

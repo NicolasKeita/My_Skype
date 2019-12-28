@@ -19,8 +19,18 @@ namespace babel {
             void startVoiceCommunication(const std::string &hostAddress,
                                          unsigned int port);
             void stopCurrentCommunication();
-            void sendMessage(const std::string &msg, size_t msgLength);
-            std::string getMessage();
+
+            template<class T>
+            void sendMessage(const T &msg, size_t msgLength)
+            {
+                _udp.sendMessage<T>(msg, msgLength);
+            }
+
+            template<class T>
+            T getMessage()
+            {
+                return _udp.getReply<T>();
+            }
 
         private:
             void _handleProtocolVOIP();

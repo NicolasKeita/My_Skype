@@ -148,7 +148,7 @@ std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
     std::thread thread([&]() {
         clock_t t = clock();
         std::mutex mutex;
-        std::vector<float> buffer(FRAMES_PER_BUFFER * 1000, 0);
+        std::vector<float> buffer(FRAMES_PER_BUFFER, 0);
         while (Pa_IsStreamActive(_streamMyVoice)) {
 //            t = clock() - t;
             if (((float) clock() - t) / CLOCKS_PER_SEC > 1) {
@@ -160,7 +160,7 @@ std::pair<PaStream *,size_t> babel::AudioWrapper::recordInputVoice()
                     std::cerr << Pa_GetErrorText(_err) << std::endl;
                     exit(7);
                 }
-                network.sendMessage(std::string(buffer.begin(), buffer.end()), FRAMES_PER_BUFFER);
+                network.sendMessage<std::vector<float>>(buffer, FRAMES_PER_BUFFER);
             }
             mutex.unlock();
         }
@@ -184,8 +184,8 @@ void babel::AudioWrapper::listenSound()
             if (((float) clock() - t) / CLOCKS_PER_SEC > 1) {
                 t = clock();
                 mutex.lock();
-                std::string msg = network.getMessage();
-                _err = Pa_WriteStream(_streamTheirVoice, msg.c_str(), 10);
+                std::vector<float> msg = network.getMessage<std::vector<float>>();
+                _err = Pa_WriteStream(_streamTheirVoice, msg.data(), 10);
                 if (_err != paNoError) {
                     std::cerr << Pa_GetErrorText(_err) << std::endl;
                     exit(8);
@@ -197,7 +197,7 @@ void babel::AudioWrapper::listenSound()
     thread.detach();
 }
 
-void babel::AudioWrapper::playRecord(std::vector<unsigned char> &record)
+void babel::AudioWrapper::playRecord(std::vector<float> &record)
 {
     PaError paErr;
     while (Pa_GetStreamWriteAvailable(_streamMyVoice) < (long)record.size());
@@ -226,7 +226,7 @@ void babel::AudioWrapper::startStream()
     PaError paErr = Pa_OpenDefaultStream(
             &_streamMyVoice,
             _channel,
-            _channel, paFloat32, _sampleRate,
+            _channel, paFloat32, SAMPLE_RATE,
             _bufferSize, nullptr, nullptr);
     if (paErr != paNoError) {
         std::cerr << Pa_GetErrorText(paErr) << std::endl;
@@ -273,11 +273,11 @@ void babel::AudioWrapper::startRecording()
     _recording = true;
 }
 
-std::vector<unsigned char> babel::AudioWrapper::getRecord()
+std::vector<float> babel::AudioWrapper::getRecord()
 {
     PaError paErr;
     long streamReadAvailable = Pa_GetStreamReadAvailable(_streamMyVoice);
-    std::vector<unsigned char> record(_bufferSize);
+    std::vector<float> record(_bufferSize);
     if (streamReadAvailable < (long)_bufferSize)
         paErr = Pa_ReadStream(
                 _streamMyVoice, record.data(),
