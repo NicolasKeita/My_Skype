@@ -23,23 +23,23 @@ add_executable(babel_client
         srcs/AudioWrapper.cpp)
 
 target_include_directories(babel_client PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/lib/uti/my_network/BlockingMultiThread
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/uti/my_network/BlockingMultiThread/
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/uti/my_prog_args/
         ${CONAN_INCLUDE_DIRS})
 
 target_link_directories(babel_client PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/uti/my_network
-        #${CONAN_LIB_DIRS}
+        ${CONAN_LIB_DIRS}
         )
 
 target_link_libraries(babel_client PUBLIC
-#        ${CONAN_LIBS_QT5}
         Qt5::Widgets
         ${CONAN_LIBS_PORTAUDIO}
-        ${Boost_LIBRARIES}
+        boost_serialization
         my_network
         )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-    target_compile_options(babel_client PRIVATE -Wall -Wextra -fPIC -DQT_NO_VERSION_TAGGING -g3)
+    target_compile_options(babel_client PRIVATE -Wall -Wextra -fPIC -DQT_NO_VERSION_TAGGING)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 

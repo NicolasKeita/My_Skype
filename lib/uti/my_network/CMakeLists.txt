@@ -37,7 +37,7 @@ target_include_directories(my_network PUBLIC
 target_link_libraries(my_network ${CMAKE_THREAD_LIBS_INIT})
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-    target_compile_options(my_network PRIVATE -Wall -Wextra -g3)
+    target_compile_options(my_network PRIVATE -Wall -Wextra)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 enable_testing()
