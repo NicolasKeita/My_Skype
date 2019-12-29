@@ -4,7 +4,6 @@ qt/5.14.0@bincrafters/stable
 boost/1.71.0@conan/stable
 zlib/1.2.11@conan/stable
 bzip2/1.0.8@conan/stable
-#expat/2.2.5@bincrafters/stable
 
 [build_requires]
 
@@ -12,12 +11,11 @@ bzip2/1.0.8@conan/stable
 boost:shared=False
 qt:shared=False
 portaudio:shared=False
-#expat:shared=True
 
 [generators]
 cmake
 visual_studio
 
 [imports]
-bin, *.dll -> ./bin # Copies all dll files from packages bin folder to my "bin" folder
-# lib/, *.so -> ./bin # doesn't work on Linux, (bug error about .so)
+#bin, *.dll -> ./bin # Copies all dll files from packages bin folder to my "bin" folder
+#lib/, *.so -> ./bin # doesn't work on Linux, (bug error about .so)

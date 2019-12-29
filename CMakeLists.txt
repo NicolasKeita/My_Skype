@@ -12,7 +12,7 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Portaudio REQUIRED)
-find_package(Boost COMPONENTS serialization REQUIRED)
+find_package(Boost 1.71.0 COMPONENTS serialization REQUIRED)
 
 add_subdirectory("${CMAKE_HOME_DIRECTORY}/lib/uti/my_network")
 
@@ -35,7 +35,7 @@ target_link_directories(babel_client PUBLIC
 target_link_libraries(babel_client PUBLIC
         Qt5::Widgets
         ${CONAN_LIBS_PORTAUDIO}
-        boost_serialization
+	${CONAN_LIBS_BOOST}
         my_network
         )
 

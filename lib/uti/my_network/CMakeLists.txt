@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12.4)
+cmake_minimum_required(VERSION 3.15)
 project(my_network_library)
 
 set(CMAKE_CXX_STANDARD		    17)
@@ -18,7 +18,7 @@ if (DEFINED ENV{BOOST_ROOT})
     set(BOOST_LIBRARY_DIRS "${BOOST_ROOT}/lib")
 endif()
 
-find_package(Boost COMPONENTS serialization REQUIRED)
+find_package(Boost 1.71.0 COMPONENTS serialization REQUIRED)
 find_package(Threads REQUIRED)
 
 add_library(my_network STATIC
