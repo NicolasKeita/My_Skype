@@ -16,8 +16,7 @@ int main(int argc, char *argv[])
     clientWrapper.setWindowSize(WIDTH_WIN, HEIGHT_WIN);
     clientWrapper.createHomePage();
     clientWrapper.showPage();
-    //QApplication::exec();
-    app.exec();
+    QApplication::exec();
 
     network.stopCurrentCommunication();
     return 0;

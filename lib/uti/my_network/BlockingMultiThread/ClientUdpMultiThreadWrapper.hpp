@@ -58,9 +58,10 @@ namespace uti::network {
                 buffers.emplace_back(boost::asio::buffer(header));
                 buffers.emplace_back(boost::asio::buffer(message_serialized));
 
+                // Sending a long serialized message
                 _socket->send_to(boost::asio::buffer(header), *_endpoints.begin());
                 _socket->send_to(boost::asio::buffer(message_serialized), *_endpoints.begin());
-                //_socket->send_to(buffers, *_endpoints.begin());
+                //_socket->send_to(buffers, *_endpoints.begin()); // TODO : send it only once (merge header + message)
             }
 
             template<class T>
@@ -68,6 +69,7 @@ namespace uti::network {
             {
                 using boost::asio::ip::udp;
 
+                // Receive the header
                 _socket->receive(boost::asio::buffer(inbound_header));
 
                 std::istringstream is(std::string(inbound_header, _header_length));
@@ -80,7 +82,6 @@ namespace uti::network {
                 // Conversion hex to dec
                 std::stringstream stream;
                 size_t inbound_data_size_in_decimal;
-
                 stream << inbound_data_size;
                 stream >> std::hex >> inbound_data_size_in_decimal;
 

@@ -26,7 +26,7 @@ void babel::NetworkHandler::_handleProtocolVOIP()
         if (_audio->isRecording()) {
             clock_t t = clock();
             while (true) {
-                if (((float) clock() - t) / CLOCKS_PER_SEC > 0.1) { // Sending slower would be bad
+                if (((float) clock() - t) / CLOCKS_PER_SEC > 0.1) { // Sending slower would create the "output underflow" error
                     t = clock();
                     std::vector<float> record = _audio->getRecord();
                     _udp.sendMessage<std::vector<float>>(record);
@@ -36,7 +36,7 @@ void babel::NetworkHandler::_handleProtocolVOIP()
     });
     thread.detach();
 
-    std::thread thread2([&](){
+    std::thread thread2([&]() {
         if (_audio->isRecording()) {
             while (true) {
                 std::vector<float> record = _udp.getReply<std::vector<float>>();
@@ -45,27 +45,8 @@ void babel::NetworkHandler::_handleProtocolVOIP()
         }
     });
     thread2.detach();
-    //_audio->listenSound();
-    // Sending voiceData async automatically
-    //AudioWrapper audio(*this);
-
-    //while (true) {}
 }
 
 void babel::NetworkHandler::stopCurrentCommunication()
-{
-    //_thread.join();
-}
+{}
 
-/*
-template<class T>
-void babel::NetworkHandler::sendMessage(const T &msg, size_t msgLength)
-{
-    _udp.sendMessage<T>(msg, msgLength);
-}
-
-template<class T>
-T babel::NetworkHandler::getMessage()
-{
-    return _udp.getReply<T>();
-}*/

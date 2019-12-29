@@ -18,7 +18,6 @@ namespace babel::graphic {
             virtual void createPhoneCallPage() = 0;
             virtual void deletePage() = 0;
             virtual void showPage() = 0;
-
     };
 }
 

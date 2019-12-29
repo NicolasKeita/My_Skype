@@ -12,8 +12,10 @@
 
 namespace uti::network {
     class IClientUdpMultiThreadWrapper {
-        protected:
+        public:
             virtual void setServer(const std::string &serverAddress, unsigned int port) = 0;
+            // template<class T> void sendMessage(const T & message) Templates cannot appear in interfaces
+            // template<class T> T getReply() Templates cannot appear in interfaces
             virtual void stop() = 0;
     };
 }

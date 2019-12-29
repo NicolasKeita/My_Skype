@@ -24,24 +24,11 @@ namespace babel {
                                          unsigned int port);
             void stopCurrentCommunication();
 
-            template<class T>
-            void sendMessage(const T &msg, size_t msgLength)
-            {
-                _udp.sendMessage<T>(msg, msgLength);
-            }
-
-            template<class T>
-            T getMessage()
-            {
-                return _udp.getReply<T>();
-            }
-
         private:
             void _handleProtocolVOIP();
 
         private:
             uti::network::ClientUdpMultiThreadWrapper   _udp;
-            std::thread                                 _thread;
             std::unique_ptr<AudioWrapper>               _audio;
     };
 }

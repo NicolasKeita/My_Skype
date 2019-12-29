@@ -8,11 +8,7 @@
 #include <boost/any.hpp>
 #include "portaudio.h"
 
-#define PA_SAMPLE_TYPE  paFloat32
-#define PRINTF_S_FORMAT "%.8f"
-using SAMPLE = unsigned char;
-//using SAMPLE = float;
-#define NUM_CHANNELS (2)
+using SAMPLE = float;
 #define SAMPLE_SILENCE (0.0f)
 
 namespace babel {
@@ -21,9 +17,7 @@ namespace babel {
         public:
             explicit AudioWrapper(NetworkHandler &network);
 
-            std::pair<PaStream *,size_t> recordInputVoice();
-            void listenSound();
-            void playRecord(std::vector<float> &record);
+            void playRecord(std::vector<float> record);
             std::vector<float> getRecord();
             void restartStream();
             void startStream();
@@ -34,36 +28,19 @@ namespace babel {
             bool isRecording();
 
         private:
-            PaStreamParameters _inputParameters;
-            PaStreamParameters _outputParameters;
             PaStream            *_streamMyVoice;
             PaStream            *_streamTheirVoice;
             PaError             _err;
-            const PaDeviceInfo  *_inputInfo;
-            const PaDeviceInfo  *_outputInfo;
             char                *_sampleBlock;
             int                 _i;
-            unsigned int        _numBytes;
-            int                 _numChannels;
-            unsigned int        _numSamples;
-            int                 _totalFrames;
             SAMPLE              max;
             SAMPLE              val;
             double              average;
             NetworkHandler      &network;
             bool                _streaming;
             bool                _recording;
-            uint32_t            _channel;
-            uint32_t            _bufferSize;
+            int                 _bufferSize; // AKA FramesPerBuffer
             uint32_t            _sampleRate;
-
-        public:
-            static constexpr int SAMPLE_RATE = 44100;
-            static constexpr int FRAMES_PER_BUFFER = 1024;
-            static constexpr int NUM_SECONDS = 10; // Temps du recording
-            static constexpr int DITHER_FLAG = 0;
-
-            //static constexpr int SAMPLE_SIZE = 4;
     };
 }
 

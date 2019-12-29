@@ -17,22 +17,18 @@
 namespace babel::graphic {
     class GraphicWrapper : public QDialog, public IGraphicWrapper {
         public:
-            GraphicWrapper(QApplication &app);
+            explicit GraphicWrapper(QApplication &app);
 
-            void setWindowSize(std::size_t width, std::size_t height);
-            void createHomePage();
-            void createPhoneCallPage();
-            void deletePage();
-            void showPage();
+            void setWindowSize(std::size_t width, std::size_t height) override;
+            void createHomePage() override;
+            void createPhoneCallPage() override;
+            void deletePage() override;
+            void showPage() override;
 
         private:
-            void sound_test(); // TODO : remove
-            QApplication        &_app;
+            QApplication    &_app;
             QWidget         _window;
-
-            QPushButton button;
-
-            //babel::network::ClientWrapper   network;
+            QPushButton     button;
     };
 }
 
