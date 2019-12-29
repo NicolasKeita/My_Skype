@@ -79,7 +79,7 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
           _streaming { false },
           _recording { false },
           _channel(1),
-          _bufferSize(480),
+          _bufferSize(2879),
           _sampleRate(48000)
 {
     // maxFrameIndex = NUM_SECONDS * SAMPLE_RATE;
@@ -210,6 +210,8 @@ void babel::AudioWrapper::playRecord(std::vector<float> &record)
     long streamWriteAvailable = 0;
     while (streamWriteAvailable < static_cast<long>(record.size())) {
         streamWriteAvailable = Pa_GetStreamReadAvailable(_streamMyVoice);
+        std::cout << "I can write " << streamWriteAvailable << " on the stream" << std::endl;
+        std::cout << "I wanna write " << record.size() << std::endl;
 
         paErr = Pa_WriteStream(_streamMyVoice, record.data(), record.size());
         if (paErr != paNoError) {
