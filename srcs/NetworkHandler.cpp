@@ -15,28 +15,34 @@ void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddre
     _udp.setServer(hostAddress, port);
 
     _audio = std::make_unique<babel::AudioWrapper>(*this);
+    _audio->startStream();
+    _audio->startRecording();
     this->_handleProtocolVOIP();
 }
 
 void babel::NetworkHandler::_handleProtocolVOIP()
 {
     std::thread thread([&]() {
-        clock_t t = clock();
-        while (true) {
-            if (((float) clock() - t) / CLOCKS_PER_SEC > 0.5) {
-                t = clock();
-                std::vector<float> record = _audio->getRecord();
-                _udp.sendMessage<std::vector<float>>(record);
+        if (_audio->isRecording()) {
+            clock_t t = clock();
+            while (true) {
+                if (((float) clock() - t) / CLOCKS_PER_SEC > 0.5) {
+                    t = clock();
+                    std::vector<float> record = _audio->getRecord();
+                    _udp.sendMessage<std::vector<float>>(record);
+                }
             }
         }
     });
     thread.detach();
 
     std::thread thread2([&](){
-       while (true) {
-            std::vector<float> record = _udp.getReply<std::vector<float>>();
-            _audio->playRecord(record);
-       }
+        if (_audio->isRecording()) {
+            while (true) {
+                std::vector<float> record = _udp.getReply<std::vector<float>>();
+                _audio->playRecord(record);
+            }
+        }
     });
     thread2.detach();
     //_audio->listenSound();

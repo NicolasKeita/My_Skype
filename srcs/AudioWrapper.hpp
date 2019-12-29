@@ -32,6 +32,7 @@ namespace babel {
             void stopStream();
             void stopRecording();
             void startRecording();
+            bool isRecording();
 
         private:
             PaStreamParameters _inputParameters;
@@ -52,7 +53,7 @@ namespace babel {
             double              average;
             NetworkHandler      &network;
             bool                _streaming;
-            bool _recording;
+            bool                _recording;
             uint32_t            _channel;
             uint32_t            _bufferSize;
             uint32_t            _sampleRate;

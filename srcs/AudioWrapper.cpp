@@ -113,6 +113,7 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
     _outputParameters.suggestedLatency = _outputInfo->defaultHighOutputLatency;
     _outputParameters.hostApiSpecificStreamInfo = nullptr;
 
+    /*
     _err = Pa_OpenStream(&_streamMyVoice,
                          &_inputParameters,
                          nullptr,
@@ -133,6 +134,7 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
                          &network);
     if( _err != paNoError )
         exit(3);
+        */
 }
 
 
@@ -206,13 +208,14 @@ void babel::AudioWrapper::playRecord(std::vector<float> &record)
 {
     PaError paErr;
     long streamWriteAvailable = 0;
-    while (streamWriteAvailable < (long)record.size()) {
+    while (streamWriteAvailable < static_cast<long>(record.size())) {
         streamWriteAvailable = Pa_GetStreamReadAvailable(_streamMyVoice);
-        //while (Pa_GetStreamWriteAvailable(_streamMyVoice) < (long)record.size());
-        paErr = Pa_WriteStream(_streamMyVoice, record.data(),
-                               (unsigned long) record.size());
-        if (paErr != paNoError)
-            this->restartStream();
+
+        paErr = Pa_WriteStream(_streamMyVoice, record.data(), record.size());
+        if (paErr != paNoError) {
+            //std::cerr << "[AudioWRapper Playrecord()] " << Pa_GetErrorText(_err) << std::endl;
+            //this->restartStream();
+        }
     }
 }
 
@@ -287,13 +290,26 @@ std::vector<float> babel::AudioWrapper::getRecord()
     PaError paErr;
     long streamReadAvailable = Pa_GetStreamReadAvailable(_streamMyVoice);
     std::vector<float> record(_bufferSize);
-    if (streamReadAvailable < (long)_bufferSize)
-        paErr = Pa_ReadStream(
-                _streamMyVoice, record.data(),
-                (unsigned long)streamReadAvailable);
-    else
-        paErr = Pa_ReadStream(_streamMyVoice, record.data(), _bufferSize);
-    if (paErr != paNoError)
-        restartStream();
+    if (streamReadAvailable < (long)_bufferSize) {
+        paErr = Pa_ReadStream(_streamMyVoice,
+                              record.data(),
+                              streamReadAvailable);
+        if (paErr != paNoError)
+            std::cerr << "[AudioWrapper, getRecord() 1] Error on ReadStream" << Pa_GetErrorText(paErr) << std::endl;
+    } else {
+        paErr = Pa_ReadStream(_streamMyVoice,
+                              record.data(),
+                              _bufferSize);
+        if (paErr != paNoError) {
+            std::cerr << "[AudioWrapper, getRecord() 2] Error on ReadStream" << Pa_GetErrorText(paErr) << std::endl;
+            restartStream();
+        }
+    }
+    record.shrink_to_fit();
     return record;
+}
+
+bool babel::AudioWrapper::isRecording()
+{
+    return _recording;
 }

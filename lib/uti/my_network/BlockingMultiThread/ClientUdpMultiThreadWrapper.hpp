@@ -83,6 +83,7 @@ namespace uti::network {
 
                 stream << inbound_data_size;
                 stream >> std::hex >> inbound_data_size_in_decimal;
+
                 inbound_data.resize(inbound_data_size_in_decimal);
 
                 auto numberOfBytesReceived2 = _socket->receive(boost::asio::buffer(inbound_data));
