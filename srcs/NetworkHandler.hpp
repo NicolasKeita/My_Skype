@@ -18,8 +18,10 @@ namespace uti::network {
 namespace babel {
     class NetworkHandler {
         public:
-            NetworkHandler() = default;
+            NetworkHandler() : _partnerFound { false } {};
 
+            int tryToConnect(const std::string &hostAddress,
+                             unsigned int port);
             void startVoiceCommunication(const std::string &hostAddress,
                                          unsigned int port);
             void stopCurrentCommunication();
@@ -30,6 +32,7 @@ namespace babel {
         private:
             uti::network::ClientUdpMultiThreadWrapper   _udp;
             std::unique_ptr<IAudioWrapper>              _audio;
+            bool                                        _partnerFound;
     };
 }
 

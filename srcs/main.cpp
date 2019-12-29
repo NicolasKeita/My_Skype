@@ -22,6 +22,7 @@ void startVoiceCommunication(babel::NetworkHandler &network,
             exit(84);
         }
     }
+    network.tryToConnect(serverAddress, port);
     network.startVoiceCommunication(serverAddress, port);
 }
 

@@ -8,11 +8,11 @@
 #include "NetworkHandler.hpp"
 
 babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
-        : _stream {nullptr },
+        : _stream { nullptr },
           network { network },
           _streaming { false },
           _recording { false },
-          _bufferSize { 3000 },
+          _bufferSize { 3600 },
           _sampleRate { 44100 }
 {
     PaError paErr;
@@ -100,13 +100,14 @@ void babel::AudioWrapper::startRecording()
         exit(6);
     }
     _recording = true;
+    _firstRecording = true;
 }
 
 std::vector<SAMPLE> babel::AudioWrapper::getRecord()
 {
     PaError paErr;
     long streamReadAvailable = Pa_GetStreamReadAvailable(_stream);
-    std::vector<SAMPLE> record(_bufferSize);
+    std::vector<SAMPLE> record(_bufferSize, SAMPLE_SILENCE);
     if (streamReadAvailable < (long)_bufferSize) {
         paErr = Pa_ReadStream(_stream,
                               record.data(),

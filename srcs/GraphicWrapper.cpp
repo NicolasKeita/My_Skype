@@ -7,10 +7,8 @@
 
 #include <QtGui/QFontDatabase>
 #include <QtWidgets/QAbstractButton>
-#include <QtWidgets/QPushButton>
 #include "GraphicWrapper.hpp"
 #include "Macro.hpp"
-#include "Exception.hpp"
 
 babel::graphic::GraphicWrapper::GraphicWrapper(QApplication &app)
         : _app{ app },
