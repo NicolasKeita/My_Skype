@@ -23,7 +23,7 @@ void uti::network::ClientUdpMultiThreadWrapper::setServer(const std::string &ser
     _port = port;
     using boost::asio::ip::udp;
     _socket = std::make_unique<udp::socket>(_io_context,
-                                            udp::endpoint(udp::v4(), port));
+                                            udp::endpoint(udp::v4(), port)); // Change port to 0 may fix a mysterious port bug
     _endpoints = _resolver.resolve(udp::v4(),
                                    _serverAddress,
                                    std::to_string(_port));

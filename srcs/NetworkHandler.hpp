@@ -29,7 +29,7 @@ namespace babel {
 
         private:
             uti::network::ClientUdpMultiThreadWrapper   _udp;
-            std::unique_ptr<AudioWrapper>               _audio;
+            std::unique_ptr<IAudioWrapper>              _audio;
     };
 }
 
