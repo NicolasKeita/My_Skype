@@ -23,13 +23,20 @@ void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddre
 void babel::NetworkHandler::_handleProtocolVOIP()
 {
     std::thread thread([&]() {
-        if (_audio->isRecording()) {
+        if (_audio->isStreaming()) {
             clock_t t = clock();
+            clock_t clock_resetStream = clock();
             while (true) {
-                if (((float) clock() - t) / CLOCKS_PER_SEC > 0.1) { // Sending slower would create the "output underflow" error
-                    t = clock();
-                    std::vector<float> record = _audio->getRecord();
-                    _udp.sendMessage<std::vector<float>>(record);
+                if (((float) clock() - clock_resetStream) / CLOCKS_PER_SEC > 4.0) {
+                    _audio->restartStream();
+                    clock_resetStream = clock();
+                }
+                if (_audio->isRecording() && _audio->isStreaming()) {
+                    if (((float) clock() - t) / CLOCKS_PER_SEC > 0.1) { // Sending slower would create the "output underflow" error
+                        t = clock();
+                        std::vector<float> record = _audio->getRecord();
+                        _udp.sendMessage<std::vector<float>>(record);
+                    }
                 }
             }
         }

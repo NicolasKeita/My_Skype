@@ -26,6 +26,7 @@ namespace babel {
             void stopRecording();
             void startRecording();
             bool isRecording();
+            bool isStreaming();
 
         private:
             PaStream            *_streamMyVoice;

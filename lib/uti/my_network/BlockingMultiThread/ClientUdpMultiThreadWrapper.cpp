@@ -5,10 +5,7 @@
 **
 */
 
-
 #include "ClientUdpMultiThreadWrapper.hpp"
-
-using boost::asio::ip::udp;
 
 uti::network::ClientUdpMultiThreadWrapper::ClientUdpMultiThreadWrapper()
         : _resolver { _io_context },
@@ -24,6 +21,7 @@ void uti::network::ClientUdpMultiThreadWrapper::setServer(const std::string &ser
 {
     _serverAddress = serverAddress;
     _port = port;
+    using boost::asio::ip::udp;
     _socket = std::make_unique<udp::socket>(_io_context,
                                             udp::endpoint(udp::v4(), port));
     _endpoints = _resolver.resolve(udp::v4(),

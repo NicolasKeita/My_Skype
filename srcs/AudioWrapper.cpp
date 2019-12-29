@@ -62,7 +62,8 @@ void babel::AudioWrapper::startStream()
             1, paFloat32, _sampleRate,
             _bufferSize, nullptr, nullptr);
     if (paErr != paNoError) {
-        std::cerr << Pa_GetErrorText(paErr) << std::endl;
+        std::cerr << "[AudioWrapper startStream()] unable to startstream " \
+            << Pa_GetErrorText(paErr) << std::endl;
         exit(6);
     }
     _streaming = true;
@@ -133,4 +134,9 @@ std::vector<SAMPLE> babel::AudioWrapper::getRecord()
 bool babel::AudioWrapper::isRecording()
 {
     return _recording;
+}
+
+bool babel::AudioWrapper::isStreaming()
+{
+    return _streaming;
 }
