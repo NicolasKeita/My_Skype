@@ -100,7 +100,6 @@ void babel::AudioWrapper::startRecording()
         exit(6);
     }
     _recording = true;
-    _firstRecording = true;
 }
 
 std::vector<SAMPLE> babel::AudioWrapper::getRecord()
