@@ -2,6 +2,7 @@
 // Created by spynight on 12/25/19.
 //
 
+#include <time.h>
 #include <thread>
 #include <vector>
 #include <string>
@@ -20,21 +21,20 @@ void babel::NetworkHandler::startVoiceCommunication(const std::string &hostAddre
 void babel::NetworkHandler::_handleProtocolVOIP()
 {
     std::thread thread([&]() {
+        clock_t t = clock();
         while (true) {
-            std::vector<float> record = _audio->getRecord();
-            std::cout << "Sending ..." << std::endl;
-            _udp.sendMessage<std::vector<float>>(record, record.size());
-            std::cout << "DONE sending ..." << std::endl;
-            return;
+            if (((float) clock() - t) / CLOCKS_PER_SEC > 0.5) {
+                t = clock();
+                std::vector<float> record = _audio->getRecord();
+                _udp.sendMessage<std::vector<float>>(record);
+            }
         }
     });
     thread.detach();
 
     std::thread thread2([&](){
        while (true) {
-           std::cout << "Receiving ..." << std::endl;
             std::vector<float> record = _udp.getReply<std::vector<float>>();
-           std::cout << "DONE Receiving ..." << std::endl;
             _audio->playRecord(record);
        }
     });

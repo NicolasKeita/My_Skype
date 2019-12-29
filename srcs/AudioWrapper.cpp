@@ -235,8 +235,8 @@ void babel::AudioWrapper::startStream()
     PaError paErr = Pa_OpenDefaultStream(
             &_streamMyVoice,
             _channel,
-            _channel, paFloat32, SAMPLE_RATE,
-            FRAMES_PER_BUFFER, nullptr, nullptr);
+            _channel, paFloat32, _sampleRate,
+            _bufferSize, nullptr, nullptr);
     if (paErr != paNoError) {
         std::cerr << Pa_GetErrorText(paErr) << std::endl;
         exit(6);
@@ -286,13 +286,13 @@ std::vector<float> babel::AudioWrapper::getRecord()
 {
     PaError paErr;
     long streamReadAvailable = Pa_GetStreamReadAvailable(_streamMyVoice);
-    std::vector<float> record(FRAMES_PER_BUFFER);
-    if (streamReadAvailable < (long)FRAMES_PER_BUFFER)
+    std::vector<float> record(_bufferSize);
+    if (streamReadAvailable < (long)_bufferSize)
         paErr = Pa_ReadStream(
                 _streamMyVoice, record.data(),
                 (unsigned long)streamReadAvailable);
     else
-        paErr = Pa_ReadStream(_streamMyVoice, record.data(), FRAMES_PER_BUFFER);
+        paErr = Pa_ReadStream(_streamMyVoice, record.data(), _bufferSize);
     if (paErr != paNoError)
         restartStream();
     return record;

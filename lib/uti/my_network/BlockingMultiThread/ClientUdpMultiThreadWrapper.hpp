@@ -30,7 +30,7 @@ namespace uti::network {
             void setServer(const std::string &serverAddress, unsigned int port) override;
 
             template<class T>
-            void sendMessage(const T & message, size_t messageLength)
+            void sendMessage(const T & message)
             {
                 if (!_serverSet) {
                     std::cerr << "[Network ClientUdpMultiThread] Where to send ? You first have to set a host" << std::endl;
@@ -55,10 +55,12 @@ namespace uti::network {
 
                 // Merge
                 std::vector<boost::asio::const_buffer> buffers;
-                buffers.push_back(boost::asio::buffer(header));
-                buffers.push_back(boost::asio::buffer(message_serialized));
+                buffers.emplace_back(boost::asio::buffer(header));
+                buffers.emplace_back(boost::asio::buffer(message_serialized));
 
-                _socket->send_to(buffers, *_endpoints.begin());
+                _socket->send_to(boost::asio::buffer(header), *_endpoints.begin());
+                _socket->send_to(boost::asio::buffer(message_serialized), *_endpoints.begin());
+                //_socket->send_to(buffers, *_endpoints.begin());
             }
 
             template<class T>
@@ -66,7 +68,7 @@ namespace uti::network {
             {
                 using boost::asio::ip::udp;
 
-                _socket->receive(boost::asio::buffer(inbound_header));
+                auto numberOfBytesReceived = _socket->receive(boost::asio::buffer(inbound_header));
 
                 std::istringstream is(std::string(inbound_header, _header_length));
                 std::size_t inbound_data_size = 0;
@@ -75,8 +77,15 @@ namespace uti::network {
                     std::cerr << "[CLientUdpMultiThread] Header is not valid : " << std::dec << inbound_data_size << std::endl;
                     exit(31);
                 }
-                inbound_data.resize(inbound_data_size);
-                _socket->receive(boost::asio::buffer(inbound_data));
+                // Conversion hex to dec
+                std::stringstream stream;
+                size_t inbound_data_size_in_decimal;
+
+                stream << inbound_data_size;
+                stream >> std::hex >> inbound_data_size_in_decimal;
+                inbound_data.resize(inbound_data_size_in_decimal);
+
+                auto numberOfBytesReceived2 = _socket->receive(boost::asio::buffer(inbound_data));
 
                 T t;
                 try {
