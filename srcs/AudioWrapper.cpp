@@ -213,8 +213,8 @@ void babel::AudioWrapper::playRecord(std::vector<float> &record)
 
         paErr = Pa_WriteStream(_streamMyVoice, record.data(), record.size());
         if (paErr != paNoError) {
-            //std::cerr << "[AudioWRapper Playrecord()] " << Pa_GetErrorText(_err) << std::endl;
-            //this->restartStream();
+            std::cerr << "[AudioWRapper Playrecord()] " << Pa_GetErrorText(paErr) << std::endl;
+            this->restartStream();
         }
     }
 }
