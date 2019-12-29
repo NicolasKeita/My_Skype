@@ -16,7 +16,9 @@ uti::network::ClientUdpMultiThreadWrapper::ClientUdpMultiThreadWrapper()
           _port { 0 },
           _serverSet { false },
           _header_length { 8 }
-{}
+{
+//    inbound_header = new char[_header_length];
+}
 
 void uti::network::ClientUdpMultiThreadWrapper::setServer(const std::string &serverAddress,
                                                           unsigned int port)

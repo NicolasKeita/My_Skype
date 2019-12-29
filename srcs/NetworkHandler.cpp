@@ -22,19 +22,20 @@ void babel::NetworkHandler::_handleProtocolVOIP()
     std::thread thread([&]() {
         while (true) {
             std::vector<float> record = _audio->getRecord();
+            std::cout << "Sending ..." << std::endl;
             _udp.sendMessage<std::vector<float>>(record, record.size());
-            if (true)
-                break;
+            std::cout << "DONE sending ..." << std::endl;
+            return;
         }
     });
     thread.detach();
 
     std::thread thread2([&](){
        while (true) {
+           std::cout << "Receiving ..." << std::endl;
             std::vector<float> record = _udp.getReply<std::vector<float>>();
+           std::cout << "DONE Receiving ..." << std::endl;
             _audio->playRecord(record);
-            if (true)
-                break;
        }
     });
     thread2.detach();

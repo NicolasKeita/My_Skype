@@ -9,20 +9,17 @@
 #define MY_NETWORK_LIBRARY_CLIENTUDPMULTITHREADWRAPPER_HPP
 
 #include <memory>
+#include <vector>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-
 #include <boost/serialization/vector.hpp>
-
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_woarchive.hpp> // saving
-#include <boost/archive/text_wiarchive.hpp> // loading
-
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-
+#include <boost/shared_ptr.hpp>
+#include <boost/tuple/tuple.hpp>
 #include "IClientUdpMultiThreadWrapper.hpp"
 
 namespace uti::network {
@@ -37,9 +34,8 @@ namespace uti::network {
             {
                 if (!_serverSet) {
                     std::cerr << "[Network ClientUdpMultiThread] Where to send ? You first have to set a host" << std::endl;
-                    return;
+                    exit(30);
                 }
-                //unsigned char * message_cast = boost::any_cast<unsigned char *>(message);
 
                 // Serialization
                 std::ostringstream archive_stream;
@@ -69,6 +65,47 @@ namespace uti::network {
             T getReply()
             {
                 using boost::asio::ip::udp;
+
+                _socket->receive(boost::asio::buffer(inbound_header));
+
+                std::istringstream is(std::string(inbound_header, _header_length));
+                std::size_t inbound_data_size = 0;
+
+                if (!(is >> std::hex >> inbound_data_size)) {
+                    std::cerr << "[CLientUdpMultiThread] Header is not valid : " << std::dec << inbound_data_size << std::endl;
+                    exit(31);
+                }
+                inbound_data.resize(inbound_data_size);
+                _socket->receive(boost::asio::buffer(inbound_data));
+
+                T t;
+                try {
+                    std::string archive_data(&inbound_data[0], inbound_data.size());
+                    std::istringstream archive_stream(archive_data);
+                    boost::archive::text_iarchive archive(archive_stream);
+                    archive >> t;
+                }
+                catch (std::exception & e)
+                {
+                    std::cerr << "[CLientUdpMultiThread] Unable to decode data." << std::endl;
+                    exit(34);
+                }
+                return t;
+                /*
+                void (ClientUdpMultiThreadWrapper::*f)(
+                        const boost::system::error_code&,
+                        T&, boost::tuple<Handler>)
+                = &connection::handle_read_header<T, Handler>;
+                boost::asio::async_read(socket_, boost::asio::buffer(inbound_header_),
+                                        boost::bind(f,
+                                                    this, boost::asio::placeholders::error, boost::ref(t),
+                                                    boost::make_tuple(handler)));
+            }
+
+                _socket->receive_from()
+                std::istringstream is(std::string())
+*/
+                /*
                 char reply[10000];
                 udp::endpoint sender_endpoint;
                 size_t reply_length = _socket->receive_from(
@@ -78,7 +115,9 @@ namespace uti::network {
 //    return std::string(reply, reply_length);
                 std::vector<float> array(10, 1);
                 return array;
+                 */
             };
+
             void stop() override;
 
         private:
@@ -90,6 +129,8 @@ namespace uti::network {
             size_t                  _port;
             bool                    _serverSet;
             size_t                  _header_length;
+            char                    inbound_header[8];
+            std::vector<char>       inbound_data;
     };
 }
 
