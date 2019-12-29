@@ -26,7 +26,7 @@ void babel::NetworkHandler::_handleProtocolVOIP()
         if (_audio->isRecording()) {
             clock_t t = clock();
             while (true) {
-                if (((float) clock() - t) / CLOCKS_PER_SEC > 0.5) {
+                if (((float) clock() - t) / CLOCKS_PER_SEC > 0.1) { // Sending slower would be bad
                     t = clock();
                     std::vector<float> record = _audio->getRecord();
                     _udp.sendMessage<std::vector<float>>(record);

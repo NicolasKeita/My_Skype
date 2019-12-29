@@ -68,7 +68,7 @@ namespace uti::network {
             {
                 using boost::asio::ip::udp;
 
-                auto numberOfBytesReceived = _socket->receive(boost::asio::buffer(inbound_header));
+                _socket->receive(boost::asio::buffer(inbound_header));
 
                 std::istringstream is(std::string(inbound_header, _header_length));
                 std::size_t inbound_data_size = 0;
@@ -86,7 +86,7 @@ namespace uti::network {
 
                 inbound_data.resize(inbound_data_size_in_decimal);
 
-                auto numberOfBytesReceived2 = _socket->receive(boost::asio::buffer(inbound_data));
+                _socket->receive(boost::asio::buffer(inbound_data));
 
                 T t;
                 try {
@@ -101,31 +101,6 @@ namespace uti::network {
                     exit(34);
                 }
                 return t;
-                /*
-                void (ClientUdpMultiThreadWrapper::*f)(
-                        const boost::system::error_code&,
-                        T&, boost::tuple<Handler>)
-                = &connection::handle_read_header<T, Handler>;
-                boost::asio::async_read(socket_, boost::asio::buffer(inbound_header_),
-                                        boost::bind(f,
-                                                    this, boost::asio::placeholders::error, boost::ref(t),
-                                                    boost::make_tuple(handler)));
-            }
-
-                _socket->receive_from()
-                std::istringstream is(std::string())
-*/
-                /*
-                char reply[10000];
-                udp::endpoint sender_endpoint;
-                size_t reply_length = _socket->receive_from(
-                        boost::asio::buffer(reply, 10000),
-                        sender_endpoint); // blocking function
-                //sender_endpoint is now equal to the server
-//    return std::string(reply, reply_length);
-                std::vector<float> array(10, 1);
-                return array;
-                 */
             };
 
             void stop() override;

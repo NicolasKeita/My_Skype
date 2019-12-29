@@ -25,7 +25,6 @@ namespace babel {
             void listenSound();
             void playRecord(std::vector<float> &record);
             std::vector<float> getRecord();
-            void clearBuffer();
             void restartStream();
             void startStream();
             void closeStream();

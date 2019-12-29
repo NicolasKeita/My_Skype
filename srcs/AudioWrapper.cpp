@@ -79,8 +79,8 @@ babel::AudioWrapper::AudioWrapper(NetworkHandler &network)
           _streaming { false },
           _recording { false },
           _channel(1),
-          _bufferSize(2879),
-          _sampleRate(48000)
+          _bufferSize(3000),
+          _sampleRate(44100)
 {
     // maxFrameIndex = NUM_SECONDS * SAMPLE_RATE;
     _totalFrames = NUM_SECONDS * SAMPLE_RATE;
@@ -208,24 +208,17 @@ void babel::AudioWrapper::playRecord(std::vector<float> &record)
 {
     PaError paErr;
     long streamWriteAvailable = 0;
-    while (streamWriteAvailable < static_cast<long>(record.size())) {
-        streamWriteAvailable = Pa_GetStreamReadAvailable(_streamMyVoice);
-        std::cout << "I can write " << streamWriteAvailable << " on the stream" << std::endl;
-        std::cout << "I wanna write " << record.size() << std::endl;
+    std::vector<float> record_cpy(record);
 
-        paErr = Pa_WriteStream(_streamMyVoice, record.data(), record.size());
+    while (streamWriteAvailable < static_cast<long>(record_cpy.size())) {
+        streamWriteAvailable = Pa_GetStreamWriteAvailable(_streamMyVoice);
+        record_cpy.resize(streamWriteAvailable, SAMPLE_SILENCE);
+        paErr = Pa_WriteStream(_streamMyVoice, record_cpy.data(), streamWriteAvailable);
         if (paErr != paNoError) {
             std::cerr << "[AudioWRapper Playrecord()] " << Pa_GetErrorText(paErr) << std::endl;
             this->restartStream();
         }
     }
-}
-
-void babel::AudioWrapper::clearBuffer()
-{
-    _err = Pa_StartStream(_streamTheirVoice);
-    if (_err != paNoError)
-        exit(1);
 }
 
 void babel::AudioWrapper::restartStream()
@@ -239,8 +232,8 @@ void babel::AudioWrapper::startStream()
 {
     PaError paErr = Pa_OpenDefaultStream(
             &_streamMyVoice,
-            _channel,
-            _channel, paFloat32, _sampleRate,
+            1,
+            1, paFloat32, _sampleRate,
             _bufferSize, nullptr, nullptr);
     if (paErr != paNoError) {
         std::cerr << Pa_GetErrorText(paErr) << std::endl;
